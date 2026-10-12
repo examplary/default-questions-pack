@@ -24,7 +24,7 @@ generation:
     Generate settings that look like this: {"text": "<p>The [cat] [sat] on the [mat].</p>", "correctAnswer": ["sat"]}
     Put every word or phrase the student can select in square brackets, including the wrong ones, and make each bracketed part
     unique. `correctAnswer` lists the bracketed parts that should be selected, written exactly as between the brackets.
-    Ask what to select in the description, not in the text.
+    Ask what to select in the description, not in the text. Avoid duplicate words as selectable parts.
 
 scanning:
   instructions: |
