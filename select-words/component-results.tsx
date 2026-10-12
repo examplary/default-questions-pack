@@ -8,7 +8,7 @@ const ResultsComponent: FrontendResultsComponent = ({ question, answer }) => {
   return (
     <SelectableText
       text={question.settings.text || ""}
-      selected={(answer.value as string[]).map(Number)}
+      selected={answer.value as string[]}
       showParts={question.settings.showParts !== false}
     />
   );

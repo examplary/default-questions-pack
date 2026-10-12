@@ -3,6 +3,6 @@ question:
   description: Select all verbs in the sentence.
   settings:
     text: "<p>The [technician] [inspected] the [device] and [replaced] the broken [sensor].</p>"
-    correctAnswer: [1, 3]
+    correctAnswer: ["inspected", "replaced"]
 answer:
-  value: ["1", "3"]
+  value: ["inspected", "replaced"]

@@ -21,14 +21,15 @@ components:
 generation:
   enabled: true
   instructions: |
-    Generate settings that look like this: {"text": "<p>The [cat] [sat] on the [mat].</p>", "correctAnswer": [1], "maxChoices": 0}
-    Put every word or phrase the student can select in square brackets, including the wrong ones. `correctAnswer` lists the
-    positions (starting at 0) of the bracketed parts that should be selected. Ask what to select in the description, not in the text.
+    Generate settings that look like this: {"text": "<p>The [cat] [sat] on the [mat].</p>", "correctAnswer": ["sat"]}
+    Put every word or phrase the student can select in square brackets, including the wrong ones, and make each bracketed part
+    unique. `correctAnswer` lists the bracketed parts that should be selected, written exactly as between the brackets.
+    Ask what to select in the description, not in the text.
 
 scanning:
   instructions: |
-    The answer should be an array of strings: the positions (starting at 0) of the bracketed parts in the `text` setting that the
-    student circled or marked, e.g. ["1", "3"].
+    The answer should be an array of strings: the bracketed parts in the `text` setting that the student circled or marked,
+    written exactly as between the brackets, e.g. ["sat"].
 
 timeEstimateMinutes: 1
 hasSimpleScoring: true
@@ -42,20 +43,11 @@ settings:
     required: true
 
   - id: correctAnswer
-    type: custom
+    type: string-array
     name: Correct answer
-    description: 'The positions (starting at 0) of the bracketed parts that should be selected, e.g. `[1]`.'
+    description: 'The bracketed parts that should be selected, written exactly as between the brackets, e.g. `["sat"]`.'
     hidden: true
     required: true
-
-  - id: maxChoices
-    type: number
-    name:
-      en: Maximum number of selections
-      nl: Maximaal aantal selecties
-    description: The number of parts a student can select at most, 0 for no limit.
-    min: 0
-    default: 0
 
   - id: showParts
     type: boolean
@@ -67,23 +59,20 @@ settings:
 
 responseProcessing:
   condition: |
-    =$join($sort($map($.answer.value, $string)), ",") = $join($sort($map($.question.settings.correctAnswer, $string)), ",")
+    =$join($sort($distinct($.answer.value)), "|") = $join($sort($distinct($.question.settings.correctAnswer)), "|")
   testCases:
-    - question: { settings: { text: "The [cat] [sat] on the [mat].", correctAnswer: [1] } }
-      answer: { value: ["1"] }
+    - question: { settings: { text: "The [cat] [sat] on the [mat].", correctAnswer: ["sat"] } }
+      answer: { value: ["sat"] }
       expectedOutcome: true
-    - question: { settings: { text: "The [cat] [sat] on the [mat].", correctAnswer: [0, 2] } }
-      answer: { value: ["2", "0"] }
+    - question: { settings: { text: "The [cat] [sat] on the [mat].", correctAnswer: ["cat", "mat"] } }
+      answer: { value: ["mat", "cat"] }
       expectedOutcome: true
-    - question: { settings: { text: "The [cat] [sat] on the [mat].", correctAnswer: [0, 2] } }
-      answer: { value: ["0"] }
+    - question: { settings: { text: "The [cat] [sat] on the [mat].", correctAnswer: ["cat", "mat"] } }
+      answer: { value: ["cat"] }
       expectedOutcome: false
-    - question: { settings: { text: "The [cat] [sat] on the [mat].", correctAnswer: [1] } }
-      answer: { value: ["1", "2"] }
+    - question: { settings: { text: "The [cat] [sat] on the [mat].", correctAnswer: ["sat"] } }
+      answer: { value: ["sat", "mat"] }
       expectedOutcome: false
-    - question: { settings: { text: "[a] [b] [c] [d] [e] [f] [g] [h] [i] [j] [k]", correctAnswer: [2, 10] } }
-      answer: { value: ["10", "2"] }
-      expectedOutcome: true
 
 import:
   qti3:
@@ -91,7 +80,6 @@ import:
     settings:
       text: "=$.text"
       correctAnswer: "=$.answers"
-      maxChoices: "=$.maxChoices"
       showParts: "=$not($.selectableHidden)"
 
 translations:

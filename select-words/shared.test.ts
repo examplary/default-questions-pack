@@ -1,22 +1,26 @@
 import { describe, expect, it } from "vitest";
 
-import { countParts, toggleSelection } from "./shared";
+import { getParts, toggle } from "./shared";
 
-describe("countParts", () => {
-  it("counts the bracketed parts", () => {
-    expect(countParts("<p>The [cat] [sat] on the [mat].</p>")).toBe(3);
-    expect(countParts("No parts")).toBe(0);
+describe("getParts", () => {
+  it("lists the parts in brackets", () => {
+    expect(getParts("<p>The [cat] [sat] on the [mat].</p>")).toEqual([
+      "cat",
+      "sat",
+      "mat",
+    ]);
+  });
+
+  it("leaves math alone", () => {
+    expect(
+      getParts("<p>A [note] on <inline-math>[0, 1]</inline-math>.</p>"),
+    ).toEqual(["note"]);
   });
 });
 
-describe("toggleSelection", () => {
+describe("toggle", () => {
   it("selects and deselects a part", () => {
-    expect(toggleSelection([1], 2)).toEqual([1, 2]);
-    expect(toggleSelection([1, 2], 1)).toEqual([2]);
-  });
-
-  it("drops the earliest selection at the limit", () => {
-    expect(toggleSelection([0], 2, 1)).toEqual([2]);
-    expect(toggleSelection([0, 1], 2, 2)).toEqual([1, 2]);
+    expect(toggle(["cat"], "sat")).toEqual(["cat", "sat"]);
+    expect(toggle(["cat", "sat"], "cat")).toEqual(["sat"]);
   });
 });

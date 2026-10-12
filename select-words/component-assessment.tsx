@@ -1,6 +1,6 @@
 import { FrontendAssessmentComponent } from "@examplary/ui";
 
-import { SelectableText, toggleSelection } from "./shared";
+import { SelectableText, toggle } from "./shared";
 
 const AssessmentComponent: FrontendAssessmentComponent = ({
   question,
@@ -8,8 +8,7 @@ const AssessmentComponent: FrontendAssessmentComponent = ({
   saveAnswer,
   reviewMode,
 }) => {
-  // Answers store the positions of the selected parts as strings
-  const selected = ((answer?.value as string[]) || []).map(Number);
+  const selected = (answer?.value as string[]) || [];
 
   return (
     <SelectableText
@@ -17,13 +16,9 @@ const AssessmentComponent: FrontendAssessmentComponent = ({
       selected={selected}
       correct={reviewMode ? question.settings.correctAnswer : []}
       showParts={question.settings.showParts !== false}
-      onToggle={(index) => {
-        const value = toggleSelection(
-          selected,
-          index,
-          question.settings.maxChoices,
-        );
-        saveAnswer({ value: value.map(String), completed: value.length > 0 });
+      onToggle={(part) => {
+        const value = toggle(selected, part);
+        saveAnswer({ value, completed: value.length > 0 });
       }}
     />
   );

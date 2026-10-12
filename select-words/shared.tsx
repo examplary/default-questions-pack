@@ -2,26 +2,48 @@ import { cn, RichTextDisplay } from "@examplary/ui";
 import type { KeyboardEvent, MouseEvent } from "react";
 
 const PART = /\[([^\]]+)\]/g;
+const INLINE_MATH = /(<inline-math\b[\s\S]*?<\/inline-math>)/;
 
-export const countParts = (text: string) => [...text.matchAll(PART)].length;
+// Replaces each [part] with `replace(part)`, leaving math alone
+const replaceParts = (text: string, replace: (part: string) => string) =>
+  text
+    .split(INLINE_MATH)
+    .map((chunk, i) =>
+      i % 2 ? chunk : chunk.replace(PART, (_, part) => replace(part)),
+    )
+    .join("");
+
+export const getParts = (text: string) => {
+  const parts: string[] = [];
+  replaceParts(text, (part) => {
+    parts.push(part);
+    return part;
+  });
+  return parts;
+};
+
+export const toggle = (selected: string[], part: string) =>
+  selected.includes(part)
+    ? selected.filter((p) => p !== part)
+    : [...selected, part];
 
 // Swaps each [part] for a span, so the selection can be shown through data
 // attributes while the surrounding rich text stays a single document
-const withParts = (text: string, selected: number[], correct: number[]) => {
+const withParts = (text: string, selected: string[], correct: string[]) => {
   let index = 0;
-  return text.replace(PART, (_, part) => {
-    const i = index++;
+  return replaceParts(text, (part) => {
     const attributes = [
-      `data-part="${i}"`,
-      selected.includes(i) && "data-selected",
-      correct.includes(i) && "data-correct",
+      `data-part="${index++}"`,
+      selected.includes(part) && "data-selected",
+      correct.includes(part) && "data-correct",
     ];
     return `<span ${attributes.filter(Boolean).join(" ")} role="button" tabindex="0">${part}</span>`;
   });
 };
 
-// Shows the text with its [parts] selectable; clicking a part calls `onToggle`.
-// With `showParts` off, nothing gives the parts away until they are selected.
+// Shows the text with its [parts] selectable; clicking a part calls
+// `onToggle`. With `showParts` off, nothing gives the parts away until they
+// are selected.
 export const SelectableText = ({
   text,
   selected = [],
@@ -30,25 +52,25 @@ export const SelectableText = ({
   onToggle,
 }: {
   text: string;
-  selected?: number[];
-  correct?: number[];
+  selected?: string[];
+  correct?: string[];
   showParts?: boolean;
-  onToggle?: (index: number) => void;
+  onToggle?: (part: string) => void;
 }) => {
-  const toggle = (event: MouseEvent | KeyboardEvent) => {
+  const handleToggle = (event: MouseEvent | KeyboardEvent) => {
     const part = (event.target as HTMLElement).closest<HTMLElement>(
       "[data-part]",
     );
     if (!part || !onToggle) return;
     event.preventDefault();
-    onToggle(Number(part.dataset.part));
+    onToggle(getParts(text)[Number(part.dataset.part)]);
   };
 
   return (
     <div
-      onClick={toggle}
+      onClick={handleToggle}
       onKeyDown={(event) => {
-        if (event.key === "Enter" || event.key === " ") toggle(event);
+        if (event.key === "Enter" || event.key === " ") handleToggle(event);
       }}
       className={cn(
         "[&_[data-part]]:rounded-lg",
@@ -64,15 +86,4 @@ export const SelectableText = ({
       <RichTextDisplay>{withParts(text, selected, correct)}</RichTextDisplay>
     </div>
   );
-};
-
-// Toggles a part, dropping the earliest selection when the limit is reached
-export const toggleSelection = (
-  selected: number[],
-  index: number,
-  maxChoices = 0,
-) => {
-  if (selected.includes(index)) return selected.filter((i) => i !== index);
-  const next = [...selected, index];
-  return maxChoices > 0 ? next.slice(-maxChoices) : next;
 };

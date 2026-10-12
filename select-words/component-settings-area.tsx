@@ -3,15 +3,25 @@ import {
   RichTextField,
 } from "@examplary/ui";
 
-import { countParts, SelectableText, toggleSelection } from "./shared";
+import { getParts, SelectableText, toggle } from "./shared";
 
 const SettingsAreaComponent: FrontendQuestionSettingsAreaComponent = ({
   settings,
   setSetting,
+  setMultipleSettings,
   t,
 }) => {
   const text = settings.text || "";
-  const correctAnswer = (settings.correctAnswer as number[]) || [];
+  const correctAnswer = (settings.correctAnswer as string[]) || [];
+
+  // Parts edited out of the text can't be selected, so they stop counting
+  const setText = (value: string) => {
+    const parts = getParts(value);
+    setMultipleSettings({
+      text: value,
+      correctAnswer: correctAnswer.filter((part) => parts.includes(part)),
+    });
+  };
 
   return (
     <div className="space-y-5">
@@ -21,13 +31,13 @@ const SettingsAreaComponent: FrontendQuestionSettingsAreaComponent = ({
         </label>
         <RichTextField
           value={text}
-          onChange={(value) => setSetting("text", value)}
+          onChange={setText}
           placeholder={t("placeholder")}
           className="w-full"
         />
         <div className="text-sm text-zinc-500 mt-1.5">{t("help")}</div>
       </div>
-      {countParts(text) > 0 && (
+      {getParts(text).length > 0 && (
         <div>
           <label className="block font-semibold font-heading mb-1">
             {t("correct-answer")}
@@ -38,8 +48,8 @@ const SettingsAreaComponent: FrontendQuestionSettingsAreaComponent = ({
           <SelectableText
             text={text}
             selected={correctAnswer}
-            onToggle={(index) =>
-              setSetting("correctAnswer", toggleSelection(correctAnswer, index))
+            onToggle={(part) =>
+              setSetting("correctAnswer", toggle(correctAnswer, part))
             }
           />
         </div>
