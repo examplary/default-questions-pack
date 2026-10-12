@@ -1,0 +1,109 @@
+# yaml-language-server: $schema=https://schemas.examplary.ai/question-type.json
+
+id: examplary.expansion.select-words
+public: true
+isDefault: true
+
+name:
+  en: Select words
+  nl: Woorden selecteren
+description:
+  en: Students select the correct words or phrases in a text.
+  nl: Leerlingen selecteren de juiste woorden of zinsdelen in een tekst.
+
+icon: ./icon.svg
+components:
+  assessment: ./component-assessment.tsx
+  print: ./component-print.tsx
+  results: ./component-results.tsx
+  settings-area: ./component-settings-area.tsx
+
+generation:
+  enabled: true
+  instructions: |
+    Generate settings that look like this: {"text": "<p>The [cat] [sat] on the [mat].</p>", "correctAnswer": [1], "maxChoices": 0}
+    Put every word or phrase the student can select in square brackets, including the wrong ones. `correctAnswer` lists the
+    positions (starting at 0) of the bracketed parts that should be selected. Ask what to select in the description, not in the text.
+
+scanning:
+  instructions: |
+    The answer should be an array of numbers: the positions (starting at 0) of the bracketed parts in the `text` setting that the
+    student circled or marked, e.g. [1, 3].
+
+timeEstimateMinutes: 1
+hasSimpleScoring: true
+
+settings:
+  - id: text
+    type: string
+    name: Text with selectable parts
+    description: 'The text (HTML) with each part the student can select in square brackets, e.g. `<p>The [cat] [sat] on the [mat].</p>`.'
+    hidden: true
+    required: true
+
+  - id: correctAnswer
+    type: custom
+    name: Correct answer
+    description: 'The positions (starting at 0) of the bracketed parts that should be selected, e.g. `[1]`.'
+    hidden: true
+    required: true
+
+  - id: maxChoices
+    type: number
+    name:
+      en: Maximum number of selections
+      nl: Maximaal aantal selecties
+    description: The number of parts a student can select at most, 0 for no limit.
+    min: 0
+    default: 0
+
+  - id: showParts
+    type: boolean
+    name:
+      en: Show selectable words
+      nl: Selecteerbare woorden tonen
+    description: Whether the selectable parts are shown in boxes. When disabled, they read as plain text, so students have to find them themselves.
+    default: true
+
+responseProcessing:
+  condition: |
+    =$join($map($sort($.answer.value), $string), ",") = $join($map($sort($.question.settings.correctAnswer), $string), ",")
+  testCases:
+    - question: { settings: { text: "The [cat] [sat] on the [mat].", correctAnswer: [1] } }
+      answer: { value: [1] }
+      expectedOutcome: true
+    - question: { settings: { text: "The [cat] [sat] on the [mat].", correctAnswer: [0, 2] } }
+      answer: { value: [2, 0] }
+      expectedOutcome: true
+    - question: { settings: { text: "The [cat] [sat] on the [mat].", correctAnswer: [0, 2] } }
+      answer: { value: [0] }
+      expectedOutcome: false
+    - question: { settings: { text: "The [cat] [sat] on the [mat].", correctAnswer: [1] } }
+      answer: { value: [1, 2] }
+      expectedOutcome: false
+
+import:
+  qti3:
+    hottext: true
+    settings:
+      text: "=$.text"
+      correctAnswer: "=$.answers"
+      maxChoices: "=$.maxChoices"
+      showParts: "=$not($.selectableHidden)"
+
+translations:
+  text:
+    en: Text
+    nl: Tekst
+  placeholder:
+    en: The [cat] [sat] on the [mat].
+    nl: De [kat] [zat] op de [mat].
+  help:
+    en: Put each word or phrase students can select in [square brackets].
+    nl: Zet elk woord of zinsdeel dat leerlingen kunnen selecteren tussen [vierkante haken].
+  correct-answer:
+    en: Correct answer
+    nl: Juiste antwoord
+  correct-answer-help:
+    en: Click the parts students should select.
+    nl: Klik op de delen die leerlingen moeten selecteren.

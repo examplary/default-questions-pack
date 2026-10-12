@@ -55,6 +55,12 @@ settings:
     hidden: true
     required: true
 
+  - id: choices
+    type: custom
+    name: Choices per blank
+    description: 'Optional. For each blank, the options the student picks from in a dropdown, e.g. `[["is", "are"], []]`. An empty list (or no entry) makes the blank a free text input. The correct answer for a dropdown blank must be one of its options.'
+    hidden: true
+
   - id: exactValuesCaseInsensitive
     type: boolean
     name:
@@ -205,6 +211,7 @@ import:
     settings:
       text: "=$.text"
       correctAnswer: "=$.answers"
+      choices: "=$.choices"
       exactValuesCaseInsensitive: "=$.caseInsensitive"
       exactOrder: "=$not($.anyOrder)"
 
@@ -224,3 +231,9 @@ translations:
   correct-answers:
     en: Correct answer(s)
     nl: Correcte antwoord(en)
+  choices-placeholder:
+    en: "Dropdown options (optional): is; are"
+    nl: "Keuzemenu-opties (optioneel): is; zijn"
+  choose:
+    en: Choose...
+    nl: Kies...

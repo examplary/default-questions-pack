@@ -164,6 +164,34 @@ responseProcessing:
       answer: { value: ["Grapes = Purple", "Apple = Red", "Banana = Yellow"] }
       expectedOutcome: true
 
+import:
+  qti3:
+    interaction:
+      type: MatchInteraction
+    settings:
+      left: "=[$.interaction.sourceChoices.content]"
+      # A target that can be matched more than once (like a category) is
+      # offered once for every time it can be used
+      right: |
+        =(
+          $slots := $count($.interaction.sourceChoices);
+          [$.interaction.targetChoices.(
+            $content := content;
+            $max := $exists(matchMax) ? matchMax : 1;
+            [1..($max = 0 or $max > $slots ? $slots : $max)].$content
+          )]
+        )
+      correctAnswer: |
+        =(
+          $choices := $append($.interaction.sourceChoices, $.interaction.targetChoices);
+          $contentOf := function($id) { $choices[identifier = $id].content };
+          [$.correctResponse.(
+            $ids := $split($, " ");
+            $contentOf($ids[0]) & " = " & $contentOf($ids[1])
+          )]
+        )
+      shuffle: "=$.interaction.shuffle = true"
+
 translations:
   pairs:
     en: Pairs

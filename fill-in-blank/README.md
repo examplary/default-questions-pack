@@ -8,7 +8,7 @@ The fill-in-the-blank question type (also known as a *cloze* question) shows the
 
 ## How it works for students
 
-The passage is displayed with an input field at every blank. Students type a short answer into each gap. A typical fill-in-the-blank question takes about 2 minutes.
+The passage is displayed with an input field at every blank. Students type a short answer into each gap, or pick one from a dropdown for blanks that have options. A typical fill-in-the-blank question takes about 2 minutes.
 
 ## Grading
 
@@ -20,5 +20,6 @@ Scored automatically: each blank is compared against the corresponding entry in 
 | --- | --- |
 | Text | The passage containing one or more blanks, written as `___` (three underscores). |
 | Correct answers | One correct answer per blank, in the same order as the blanks appear in the text. |
+| Dropdown options | Optional, per blank: options separated by `;`. A blank with options becomes a dropdown (QTI inline choice or gap match). |
 | Ignore spaces and capitals | Leading and trailing whitespace is always ignored; enable this to ignore letter casing too. |
 | Exact order | On by default: every blank has to match the correct answer configured for it. Turn it off to accept any of the correct answers in any blank, as long as each one is used exactly once. |

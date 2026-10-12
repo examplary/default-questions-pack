@@ -10,6 +10,19 @@ const SettingsAreaComponent: FrontendQuestionSettingsAreaComponent = ({
   t,
 }) => {
   const correctAnswer = (settings.correctAnswer as string[]) || [];
+  const choices = (settings.choices as string[][]) || [];
+
+  const setChoices = (index: number, value: string) => {
+    const next = [...choices];
+    next[index] = value
+      .split(";")
+      .map((choice) => choice.trim())
+      .filter(Boolean);
+    setSetting(
+      "choices",
+      Array.from({ length: blanks }, (_, i) => next[i] ?? []),
+    );
+  };
 
   const insertBlank = () => {
     const current = settings.text || "";
@@ -56,6 +69,12 @@ const SettingsAreaComponent: FrontendQuestionSettingsAreaComponent = ({
                     next[index] = e.target.value;
                     setSetting("correctAnswer", next);
                   }}
+                  className="min-w-24"
+                />
+                <Input
+                  defaultValue={choices[index]?.join("; ") ?? ""}
+                  onBlur={(e) => setChoices(index, e.target.value)}
+                  placeholder={t("choices-placeholder")}
                   className="min-w-24"
                 />
               </div>

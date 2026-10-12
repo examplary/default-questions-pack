@@ -1,4 +1,13 @@
-import { cn, FrontendAssessmentComponent, Input } from "@examplary/ui";
+import {
+  cn,
+  FrontendAssessmentComponent,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@examplary/ui";
 
 import { BlankText, countBlanks } from "./shared";
 
@@ -7,8 +16,10 @@ const AssessmentComponent: FrontendAssessmentComponent = ({
   answer,
   saveAnswer,
   reviewMode,
+  t,
 }) => {
   const text = question.settings.text || "";
+  const choices = (question.settings.choices as string[][]) || [];
   const value = (answer?.value as string[]) || [];
   const blankCount = countBlanks(text);
 
@@ -31,20 +42,47 @@ const AssessmentComponent: FrontendAssessmentComponent = ({
   return (
     <BlankText
       text={text}
-      renderBlank={(index) => (
-        <Input
-          className={cn(
-            "w-48 px-1.5 py-0 m-0.5 rounded-lg h-8 inline-flex mx-1",
-            reviewMode && "placeholder:text-green-800/50",
-          )}
-          value={value[index] || ""}
-          data-index={index}
-          placeholder={
-            reviewMode ? question.settings.correctAnswer?.[index] : undefined
-          }
-          onChange={(event) => setValue(index, event.currentTarget.value)}
-        />
-      )}
+      renderBlank={(index) =>
+        choices[index]?.length ? (
+          <Select
+            value={value[index] || ""}
+            onValueChange={(newValue) => setValue(index, newValue)}
+          >
+            <SelectTrigger
+              className="w-auto min-w-32 h-8 py-0 m-0.5 mx-1 inline-flex rounded-lg"
+              data-index={index}
+            >
+              <SelectValue
+                placeholder={
+                  reviewMode
+                    ? question.settings.correctAnswer?.[index]
+                    : t("choose")
+                }
+              />
+            </SelectTrigger>
+            <SelectContent>
+              {choices[index].map((choice, choiceIndex) => (
+                <SelectItem key={choiceIndex} value={choice}>
+                  {choice}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : (
+          <Input
+            className={cn(
+              "w-48 px-1.5 py-0 m-0.5 rounded-lg h-8 inline-flex mx-1",
+              reviewMode && "placeholder:text-green-800/50",
+            )}
+            value={value[index] || ""}
+            data-index={index}
+            placeholder={
+              reviewMode ? question.settings.correctAnswer?.[index] : undefined
+            }
+            onChange={(event) => setValue(index, event.currentTarget.value)}
+          />
+        )
+      }
     />
   );
 };
