@@ -4,6 +4,9 @@ import { Loader2Icon, MicIcon, SquareIcon } from "lucide-react";
 
 type AudioAnswerValue = [string, string, string?, string?];
 type RecorderStatus = "idle" | "recording" | "uploading";
+type RecorderApi = {
+  uploadPickedFile?: (file: File) => Promise<{ url: string; name: string }>;
+};
 
 const MIME_TYPES = [
   "audio/webm;codecs=opus",
@@ -46,6 +49,9 @@ const AssessmentComponent: FrontendAssessmentComponent = ({
   const maxDurationSeconds = Number(
     question.settings?.maxDurationSeconds || 300,
   );
+  // The upload helper isn't part of every API instance, so check it up front
+  const recorderApi = api as typeof api & RecorderApi;
+  const canUpload = typeof recorderApi?.uploadPickedFile === "function";
 
   const [status, setStatus] = useState<RecorderStatus>("idle");
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -84,6 +90,8 @@ const AssessmentComponent: FrontendAssessmentComponent = ({
   );
 
   const startRecording = async () => {
+    if (!canUpload) return;
+
     if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
       setError(t("microphone-unavailable"));
       return;
@@ -128,20 +136,7 @@ const AssessmentComponent: FrontendAssessmentComponent = ({
             `Voice recording ${timestamp}.${getExtension(type)}`,
             { type },
           );
-          const uploadPickedFile = (
-            api as typeof api & {
-              uploadPickedFile?: (file: File) => Promise<{
-                url: string;
-                name: string;
-              }>;
-            }
-          ).uploadPickedFile;
-
-          if (!uploadPickedFile) {
-            throw new Error("upload-unavailable");
-          }
-
-          const uploadedFile = await uploadPickedFile(file);
+          const uploadedFile = await recorderApi.uploadPickedFile!(file);
           saveAnswer({
             value: [
               uploadedFile.url,
@@ -153,11 +148,7 @@ const AssessmentComponent: FrontendAssessmentComponent = ({
           });
         } catch (e) {
           console.error(e);
-          setError(
-            e instanceof Error && e.message === "upload-unavailable"
-              ? t("upload-unavailable")
-              : t("upload-failed"),
-          );
+          setError(t("upload-failed"));
         } finally {
           stopStream(streamRef.current);
           streamRef.current = null;
@@ -210,7 +201,7 @@ const AssessmentComponent: FrontendAssessmentComponent = ({
         </div>
       ) : null}
 
-      {!reviewMode ? (
+      {!reviewMode || !value ? (
         <div className="flex flex-wrap items-center gap-2">
           {status === "recording" ? (
             <Button variant="destructive" onClick={stopRecording}>
@@ -218,7 +209,7 @@ const AssessmentComponent: FrontendAssessmentComponent = ({
               {t("stop-recording")}
             </Button>
           ) : (
-            <Button onClick={startRecording}>
+            <Button onClick={startRecording} disabled={!canUpload}>
               <MicIcon />
               {value ? t("replace-recording") : t("start-recording")}
             </Button>
@@ -233,7 +224,11 @@ const AssessmentComponent: FrontendAssessmentComponent = ({
         </div>
       ) : null}
 
-      {error ? <div className="text-sm text-red-600">{error}</div> : null}
+      {!canUpload || error ? (
+        <div className="text-sm text-red-600">
+          {canUpload ? error : t("upload-unavailable")}
+        </div>
+      ) : null}
     </div>
   );
 };
