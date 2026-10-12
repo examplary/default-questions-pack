@@ -65,7 +65,8 @@ settings:
     min: 0
     default: 1
 
-# Correct when every area holds a point, and no point is outside an area
+# Correct when no point is outside an area, and the points hit as many areas as the student
+# may place points (or every area, without a limit)
 responseProcessing:
   condition: |
     =(
@@ -78,11 +79,13 @@ responseProcessing:
         ($xy := $split($point, ","); { "x": $number($xy[0]), "y": $number($xy[1]) })
       });
       $areas := $.question.settings.areas;
+      $maxChoices := $exists($.question.settings.maxChoices) ? $.question.settings.maxChoices : 1;
+      $needed := $maxChoices > 0 and $maxChoices < $count($areas) ? $maxChoices : $count($areas);
       $hitsArea := function($point) { $count($filter($areas, function($area) { $inside($point, $area) })) > 0 };
       $isHit := function($area) { $count($filter($points, function($point) { $inside($point, $area) })) > 0 };
       $count($points) > 0
         and $count($filter($points, $hitsArea)) = $count($points)
-        and $count($filter($areas, $isHit)) = $count($areas)
+        and $count($filter($areas, $isHit)) >= $needed
     )
   testCases:
     - question: { settings: { areas: [{ shape: circle, coords: [191, 393, 10] }] } }
@@ -103,10 +106,42 @@ responseProcessing:
                   { shape: circle, coords: [191, 393, 10] },
                   { shape: rect, coords: [0, 0, 50, 50] },
                 ],
+              maxChoices: 2,
             },
         }
       answer: { value: ["191,393"] }
       expectedOutcome: false
+    # One point, several areas: any of them is correct
+    - question:
+        {
+          settings:
+            {
+              areas:
+                [
+                  { shape: circle, coords: [206, 318, 34] },
+                  { shape: circle, coords: [501, 505, 34] },
+                  { shape: circle, coords: [647, 317, 34] },
+                ],
+              maxChoices: 1,
+            },
+        }
+      answer: { value: ["511,507"] }
+      expectedOutcome: true
+    # Without a limit, every area needs a point
+    - question:
+        {
+          settings:
+            {
+              areas:
+                [
+                  { shape: circle, coords: [191, 393, 10] },
+                  { shape: rect, coords: [0, 0, 50, 50] },
+                ],
+              maxChoices: 0,
+            },
+        }
+      answer: { value: ["191,393", "10,10"] }
+      expectedOutcome: true
 
 import:
   qti3:

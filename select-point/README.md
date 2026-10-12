@@ -12,7 +12,7 @@ Students click the image to place a point, and click a point to remove it. When 
 
 ## Grading
 
-Scored automatically: the answer is correct when every area holds a point and no point is outside an area.
+Scored automatically: the answer is correct when no point is outside an area, and the points hit as many different areas as the student can place points. With one point and several areas, any of the areas is correct; without a limit, every area needs a point.
 
 ## Settings
 
