@@ -10,6 +10,4 @@ question:
         coords: [191, 393, 10]
     maxChoices: 1
 answer:
-  value:
-    - x: 192
-      y: 391
+  value: ["192,391"]

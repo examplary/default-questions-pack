@@ -27,8 +27,8 @@ generation:
 
 scanning:
   instructions: |
-    The answer should be an array of numbers: the positions (starting at 0) of the bracketed parts in the `text` setting that the
-    student circled or marked, e.g. [1, 3].
+    The answer should be an array of strings: the positions (starting at 0) of the bracketed parts in the `text` setting that the
+    student circled or marked, e.g. ["1", "3"].
 
 timeEstimateMinutes: 1
 hasSimpleScoring: true
@@ -67,20 +67,23 @@ settings:
 
 responseProcessing:
   condition: |
-    =$join($map($sort($.answer.value), $string), ",") = $join($map($sort($.question.settings.correctAnswer), $string), ",")
+    =$join($sort($map($.answer.value, $string)), ",") = $join($sort($map($.question.settings.correctAnswer, $string)), ",")
   testCases:
     - question: { settings: { text: "The [cat] [sat] on the [mat].", correctAnswer: [1] } }
-      answer: { value: [1] }
+      answer: { value: ["1"] }
       expectedOutcome: true
     - question: { settings: { text: "The [cat] [sat] on the [mat].", correctAnswer: [0, 2] } }
-      answer: { value: [2, 0] }
+      answer: { value: ["2", "0"] }
       expectedOutcome: true
     - question: { settings: { text: "The [cat] [sat] on the [mat].", correctAnswer: [0, 2] } }
-      answer: { value: [0] }
+      answer: { value: ["0"] }
       expectedOutcome: false
     - question: { settings: { text: "The [cat] [sat] on the [mat].", correctAnswer: [1] } }
-      answer: { value: [1, 2] }
+      answer: { value: ["1", "2"] }
       expectedOutcome: false
+    - question: { settings: { text: "[a] [b] [c] [d] [e] [f] [g] [h] [i] [j] [k]", correctAnswer: [2, 10] } }
+      answer: { value: ["10", "2"] }
+      expectedOutcome: true
 
 import:
   qti3:

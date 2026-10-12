@@ -5,4 +5,4 @@ question:
     text: "<p>The [technician] [inspected] the [device] and [replaced] the broken [sensor].</p>"
     correctAnswer: [1, 3]
 answer:
-  value: [1, 3]
+  value: ["1", "3"]

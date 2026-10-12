@@ -1,6 +1,6 @@
 import { FrontendResultsComponent } from "@examplary/ui";
 
-import { Point, PointImage } from "./shared";
+import { parsePoints, PointImage } from "./shared";
 
 const ResultsComponent: FrontendResultsComponent = ({ question, answer }) => {
   if (!answer.value) return null;
@@ -8,7 +8,7 @@ const ResultsComponent: FrontendResultsComponent = ({ question, answer }) => {
   return (
     <PointImage
       settings={question.settings}
-      points={answer.value as Point[]}
+      points={parsePoints(answer.value)}
       areas={question.settings.areas}
     />
   );

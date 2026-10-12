@@ -8,7 +8,8 @@ const AssessmentComponent: FrontendAssessmentComponent = ({
   saveAnswer,
   reviewMode,
 }) => {
-  const selected = (answer?.value as number[]) || [];
+  // Answers store the positions of the selected parts as strings
+  const selected = ((answer?.value as string[]) || []).map(Number);
 
   return (
     <SelectableText
@@ -22,7 +23,7 @@ const AssessmentComponent: FrontendAssessmentComponent = ({
           index,
           question.settings.maxChoices,
         );
-        saveAnswer({ value, completed: value.length > 0 });
+        saveAnswer({ value: value.map(String), completed: value.length > 0 });
       }}
     />
   );

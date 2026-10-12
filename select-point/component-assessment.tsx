@@ -1,6 +1,6 @@
 import { FrontendAssessmentComponent } from "@examplary/ui";
 
-import { Point, PointImage } from "./shared";
+import { formatPoints, parsePoints, Point, PointImage } from "./shared";
 
 const AssessmentComponent: FrontendAssessmentComponent = ({
   question,
@@ -8,11 +8,11 @@ const AssessmentComponent: FrontendAssessmentComponent = ({
   saveAnswer,
   reviewMode,
 }) => {
-  const points = (answer?.value as Point[]) || [];
+  const points = parsePoints(answer?.value);
   const maxChoices = question.settings.maxChoices ?? 1;
 
   const save = (value: Point[]) =>
-    saveAnswer({ value, completed: value.length > 0 });
+    saveAnswer({ value: formatPoints(value), completed: value.length > 0 });
 
   return (
     <PointImage

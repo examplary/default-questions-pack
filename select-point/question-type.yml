@@ -23,8 +23,8 @@ generation:
 
 scanning:
   instructions: |
-    The answer should be an array of points the student marked on the image, in the coordinates of the `width` and `height`
-    settings (or the image's own size), e.g. [{"x": 191, "y": 393}].
+    The answer should be an array of strings, one "x,y" string for each point the student marked on the image, in the
+    coordinates of the `width` and `height` settings (or the image's own size), e.g. ["191,393"].
 
 timeEstimateMinutes: 1
 hasSimpleScoring: true
@@ -74,7 +74,9 @@ responseProcessing:
           ? $power($point.x - $area.coords[0], 2) + $power($point.y - $area.coords[1], 2) <= $power($area.coords[2], 2)
           : $point.x >= $area.coords[0] and $point.x <= $area.coords[2] and $point.y >= $area.coords[1] and $point.y <= $area.coords[3]
       };
-      $points := $.answer.value;
+      $points := $map($.answer.value, function($point) {
+        ($xy := $split($point, ","); { "x": $number($xy[0]), "y": $number($xy[1]) })
+      });
       $areas := $.question.settings.areas;
       $hitsArea := function($point) { $count($filter($areas, function($area) { $inside($point, $area) })) > 0 };
       $isHit := function($area) { $count($filter($points, function($point) { $inside($point, $area) })) > 0 };
@@ -84,13 +86,13 @@ responseProcessing:
     )
   testCases:
     - question: { settings: { areas: [{ shape: circle, coords: [191, 393, 10] }] } }
-      answer: { value: [{ x: 195, y: 390 }] }
+      answer: { value: ["195,390"] }
       expectedOutcome: true
     - question: { settings: { areas: [{ shape: circle, coords: [191, 393, 10] }] } }
-      answer: { value: [{ x: 220, y: 390 }] }
+      answer: { value: ["220,390"] }
       expectedOutcome: false
     - question: { settings: { areas: [{ shape: rect, coords: [0, 0, 50, 50] }] } }
-      answer: { value: [{ x: 10, y: 40 }] }
+      answer: { value: ["10,40"] }
       expectedOutcome: true
     - question:
         {
@@ -103,7 +105,7 @@ responseProcessing:
                 ],
             },
         }
-      answer: { value: [{ x: 191, y: 393 }] }
+      answer: { value: ["191,393"] }
       expectedOutcome: false
 
 import:

@@ -4,6 +4,16 @@ import { useState, type MouseEvent } from "react";
 export type Point = { x: number; y: number };
 export type Area = { shape: "circle" | "rect"; coords: number[] };
 
+// Answers store each point as an "x,y" string
+export const parsePoints = (value: unknown): Point[] =>
+  ((value as string[]) || []).map((point) => {
+    const [x, y] = point.split(",").map(Number);
+    return { x, y };
+  });
+
+export const formatPoints = (points: Point[]) =>
+  points.map(({ x, y }) => `${x},${y}`);
+
 // Points and areas are in the image's coordinate space: `width` by `height`
 // from the settings, or the image's own size when those are not set
 export const PointImage = ({
@@ -58,7 +68,10 @@ export const PointImage = ({
         <svg
           viewBox={`0 0 ${width} ${height}`}
           preserveAspectRatio="none"
-          className={cn("absolute inset-0 size-full", onClick && "cursor-crosshair")}
+          className={cn(
+            "absolute inset-0 size-full",
+            onClick && "cursor-crosshair",
+          )}
           onClick={handleClick}
         >
           {areas.map(({ shape, coords: [a, b, c, d] }, index) => (

@@ -56,7 +56,11 @@ const SettingsAreaComponent: FrontendQuestionSettingsAreaComponent = ({
       )}
       <div>
         <Button variant="secondary" onClick={uploadImage} disabled={uploading}>
-          {uploading ? <Loader2Icon className="animate-spin" /> : <UploadIcon />}
+          {uploading ? (
+            <Loader2Icon className="animate-spin" />
+          ) : (
+            <UploadIcon />
+          )}
           {t(settings.image ? "change-image" : "upload-image")}
         </Button>
       </div>

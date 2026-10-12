@@ -22,4 +22,4 @@ Scored automatically: the answer is correct when every area holds a point and no
 | Correct areas | Circles (or, from a QTI import, rectangles) students have to click. Click the image to add one, and an area to remove it. |
 | Maximum number of points | How many points a student can place at most, 0 for no limit. |
 
-Points and areas are stored in the image's coordinate space: the `width` and `height` settings when a QTI import declares them, or the image's own size.
+Points and areas are stored in the image's coordinate space: the `width` and `height` settings when a QTI import declares them, or the image's own size. An answer stores each point as an `"x,y"` string.
