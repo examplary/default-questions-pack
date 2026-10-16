@@ -1,9 +1,9 @@
 import { cn, FrontendPrintComponent } from "@examplary/ui";
 
-import { BlankText } from "./shared";
+import { BlankText, parseChoices } from "./shared";
 
 const PrintComponent: FrontendPrintComponent = ({ answerBoxes, question }) => {
-  const choices = (question.settings.choices as string[][]) || [];
+  const choices = parseChoices(question.settings.choices);
 
   return (
     <BlankText

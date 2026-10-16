@@ -1,6 +1,12 @@
 import { FrontendAssessmentComponent } from "@examplary/ui";
 
-import { formatPoints, parsePoints, Point, PointImage } from "./shared";
+import {
+  formatPoints,
+  parseAreas,
+  parsePoints,
+  Point,
+  PointImage,
+} from "./shared";
 
 const AssessmentComponent: FrontendAssessmentComponent = ({
   question,
@@ -18,7 +24,7 @@ const AssessmentComponent: FrontendAssessmentComponent = ({
     <PointImage
       settings={question.settings}
       points={points}
-      areas={reviewMode ? question.settings.areas : []}
+      areas={reviewMode ? parseAreas(question.settings.areas) : []}
       // With the maximum reached, a new point replaces the earliest one
       onClick={(point) =>
         save([...points, point].slice(maxChoices > 0 ? -maxChoices : 0))

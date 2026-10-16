@@ -12,6 +12,26 @@ const BLANK = "___";
 
 export const countBlanks = (text: string) => text.split(BLANK).length - 1;
 
+const parseJson = (value: string) => {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return undefined;
+  }
+};
+
+// Generated questions used to store the choices as a JSON string
+export const parseChoices = (value: unknown): string[][] => {
+  const choices = typeof value === "string" ? parseJson(value) : value;
+  if (!Array.isArray(choices)) return [];
+
+  return choices.map((blank) =>
+    Array.isArray(blank)
+      ? blank.filter((choice) => typeof choice === "string")
+      : [],
+  );
+};
+
 // The question text is rich text, so it cannot be split on `___` and rendered
 // as separate fragments: each fragment is unbalanced HTML that the browser
 // silently repairs, closing block elements early — which drops the first

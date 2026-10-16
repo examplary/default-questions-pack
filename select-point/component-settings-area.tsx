@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button, FrontendQuestionSettingsAreaComponent } from "@examplary/ui";
 import { Loader2Icon, UploadIcon } from "lucide-react";
 
-import { Area, PointImage } from "./shared";
+import { parseAreas, PointImage } from "./shared";
 
 const SettingsAreaComponent: FrontendQuestionSettingsAreaComponent = ({
   settings,
@@ -13,7 +13,7 @@ const SettingsAreaComponent: FrontendQuestionSettingsAreaComponent = ({
   t,
 }) => {
   const [uploading, setUploading] = useState(false);
-  const areas = (settings.areas as Area[]) || [];
+  const areas = parseAreas(settings.areas);
 
   const uploadImage = async () => {
     setUploading(true);

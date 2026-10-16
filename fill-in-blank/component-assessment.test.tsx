@@ -14,6 +14,25 @@ const blanks = () => Array.from(document.querySelectorAll("input"));
 const type = (blank: HTMLInputElement, text: string) =>
   fireEvent.change(blank, { target: { value: text } });
 
+describe("choices", () => {
+  it("renders blanks for choices stored as a JSON string", () => {
+    renderAssessment(AssessmentComponent, {
+      settings: { ...settings, choices: '[["Paris", "Lyon"], []]' },
+    });
+
+    expect(document.querySelectorAll("[role=combobox]")).toHaveLength(1);
+    expect(blanks()).toHaveLength(1);
+  });
+
+  it("falls back to text inputs for choices that are not lists", () => {
+    renderAssessment(AssessmentComponent, {
+      settings: { ...settings, choices: ["Paris; Lyon", "Madrid; Seville"] },
+    });
+
+    expect(blanks()).toHaveLength(2);
+  });
+});
+
 describe("answer order", () => {
   it("renders one blank per ___", () => {
     renderAssessment(AssessmentComponent, { settings });

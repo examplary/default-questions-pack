@@ -11,6 +11,22 @@ export const parsePoints = (value: unknown): Point[] =>
     return { x, y };
   });
 
+const parseJson = (value: string) => {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return undefined;
+  }
+};
+
+// Generated questions used to store the areas as a JSON string
+export const parseAreas = (value: unknown): Area[] => {
+  const areas = typeof value === "string" ? parseJson(value) : value;
+  if (!Array.isArray(areas)) return [];
+
+  return areas.filter((area) => Array.isArray(area?.coords));
+};
+
 export const formatPoints = (points: Point[]) =>
   points.map(({ x, y }) => `${x},${y}`);
 

@@ -60,6 +60,12 @@ settings:
     name: Choices per blank
     description: 'Optional. For each blank, the options the student picks from in a dropdown, e.g. `[["is", "are"], []]`. An empty list (or no entry) makes the blank a free text input. The correct answer for a dropdown blank must be one of its options.'
     hidden: true
+    schema:
+      type: array
+      items:
+        type: array
+        items:
+          type: string
 
   - id: exactValuesCaseInsensitive
     type: boolean

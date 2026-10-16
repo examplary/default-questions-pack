@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@examplary/ui";
 
-import { BlankText, countBlanks } from "./shared";
+import { BlankText, countBlanks, parseChoices } from "./shared";
 
 const AssessmentComponent: FrontendAssessmentComponent = ({
   question,
@@ -19,7 +19,7 @@ const AssessmentComponent: FrontendAssessmentComponent = ({
   t,
 }) => {
   const text = question.settings.text || "";
-  const choices = (question.settings.choices as string[][]) || [];
+  const choices = parseChoices(question.settings.choices);
   const value = (answer?.value as string[]) || [];
   const blankCount = countBlanks(text);
 

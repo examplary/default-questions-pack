@@ -4,13 +4,15 @@ import {
   RichTextField,
 } from "@examplary/ui";
 
+import { parseChoices } from "./shared";
+
 const SettingsAreaComponent: FrontendQuestionSettingsAreaComponent = ({
   settings,
   setSetting,
   t,
 }) => {
   const correctAnswer = (settings.correctAnswer as string[]) || [];
-  const choices = (settings.choices as string[][]) || [];
+  const choices = parseChoices(settings.choices);
 
   const setChoices = (index: number, value: string) => {
     const next = [...choices];
