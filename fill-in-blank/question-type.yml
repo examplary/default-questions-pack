@@ -234,12 +234,21 @@ translations:
   insert-blank:
     en: Insert blank
     nl: Lege plek invoegen
+  correct-answer:
+    en: Correct answer
+    nl: Correct antwoord
   correct-answers:
-    en: Correct answer(s)
-    nl: Correcte antwoord(en)
+    en: Correct answers
+    nl: Correct antwoorden
+  choices:
+    en: Dropdown options (optional)
+    nl: Keuzemenu-opties (optioneel)
   choices-placeholder:
-    en: "Dropdown options (optional): is; are"
-    nl: "Keuzemenu-opties (optioneel): is; zijn"
+    en: "is; are"
+    nl: "is; zijn"
+  answer-not-in-choices:
+    en: The correct answer must be one of the dropdown options.
+    nl: Het correcte antwoord moet een van de keuzemenu-opties zijn.
   choose:
     en: Choose...
     nl: Kies...
