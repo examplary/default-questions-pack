@@ -18,6 +18,9 @@ components:
   results: ./component-results.tsx
   settings-area: ./component-settings-area.tsx
 
+functions:
+  validate-question: ./functions/validate-question.ts
+
 generation:
   enabled: true
   instructions: |
