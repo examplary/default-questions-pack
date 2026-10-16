@@ -489,6 +489,7 @@ __metadata:
     "@dnd-kit/sortable": "npm:^10.0.0"
     "@dnd-kit/utilities": "npm:^3.2.2"
     "@examplary/cli": "npm:^1.11.0"
+    "@examplary/schemas": "npm:^1.27.0"
     "@examplary/ui": "npm:^1.67.2"
     "@testing-library/dom": "npm:^10.4.1"
     "@testing-library/react": "npm:^16.3.2"
@@ -513,6 +514,15 @@ __metadata:
   dependencies:
     zod: "npm:^4.3.6"
   checksum: 10c0/c6cf347254489cba7508c59f948c5b590fcb7401bd140d67d51676cc8d8e3d1416070d8e0d2f58d2440677f23ca6f510f6158ce6abb31911baf4f1ccbc54b295
+  languageName: node
+  linkType: hard
+
+"@examplary/schemas@npm:^1.27.0":
+  version: 1.27.0
+  resolution: "@examplary/schemas@npm:1.27.0"
+  dependencies:
+    zod: "npm:^4.3.6"
+  checksum: 10c0/362140d1b87c6d472cc9a565943b71ade9135d2db505e90844b1e0d4b39cd27b73beb4748e3528b18edf5d5a7c38467566dffad141255d9953112fa951c0e401
   languageName: node
   linkType: hard
 
