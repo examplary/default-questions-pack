@@ -1,0 +1,39 @@
+# yaml-language-server: $schema=https://schemas.examplary.ai/app.json
+
+id: examplary.default-questions
+version: 1.0.0
+public: true
+preinstalled: true
+
+name:
+  en: Default questions
+  nl: Standaardvragen
+description:
+  en: The question types every Examplary workspace starts with, from multiple choice to essays, formulas and voice recordings.
+  nl: De vraagtypes waar elke Examplary-werkruimte mee begint, van meerkeuze tot essays, formules en spraakopnames.
+
+website: https://github.com/examplary/default-questions-pack
+
+questionTypes:
+  - ./date-year
+  - ./essay
+  - ./exam-intro
+  - ./exam-outro
+  - ./fill-in-blank
+  - ./formula
+  - ./matching
+  - ./math-notebook
+  - ./multi-line-text
+  - ./multiple-choice-multiple-answers
+  - ./multiple-choice-single-answer
+  - ./paragraph
+  - ./persona-chat
+  - ./picture-choice
+  - ./select-point
+  - ./select-words
+  - ./sentence-analysis
+  - ./sequence
+  - ./single-line-text
+  - ./true-false
+  - ./upload-file
+  - ./voice-recorder

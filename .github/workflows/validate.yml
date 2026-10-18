@@ -54,20 +54,6 @@ jobs:
           # Install dependencies
           yarn
 
-          # Validate each question type
-          failed=0
-          for dir in */; do
-            # Skip if the directory does not contain a question-type config file
-            if [ ! -f "$dir/question-type.json" ] && [ ! -f "$dir/question-type.yml" ]; then
-              continue
-            fi
+          # Validate the app and every question type it bundles
+          npx @examplary/cli@latest app validate
 
-            # Bundle and run responseProcessing test cases
-            echo "::group::Validating ${dir%/}"
-            if ! (cd "$dir" && npx @examplary/cli@latest validate); then
-              failed=1
-            fi
-            echo "::endgroup::"
-          done
-
-          exit $failed
