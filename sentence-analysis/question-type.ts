@@ -1,0 +1,334 @@
+import { defineQuestionType } from "@examplary/apps";
+
+import Assessment from "./component-assessment";
+import Print from "./component-print";
+import Results from "./component-results";
+import SettingsArea from "./component-settings-area";
+import icon from "./icon.svg";
+import preview from "./preview.yml";
+import previewImage from "./preview.png";
+import readme from "./README.md";
+
+export default defineQuestionType({
+  id: "examplary.expansion.sentence-analysis",
+  name: {
+    en: "Sentence analysis",
+    nl: "Zin ontleden",
+  },
+  description: {
+    en: "Let students split a Dutch sentence into sentence parts, label each part, and mark the finite verb.",
+    nl: "Laat leerlingen een Nederlandse zin in zinsdelen verdelen, elk zinsdeel benoemen en de persoonsvorm markeren.",
+  },
+  hasSimpleScoring: true,
+  generation: {
+    enabled: true,
+    instructions: "Use this question type for Dutch \"redekundig ontleden\": students split one sentence into contiguous zinsdelen, assign a label to each segment, and optionally mark the persoonsvorm.\n\nGenerate settings in this shape:\n{\n  \"sentence\": \"Vandaag maken wij de jaarplanner voor klas 2.\",\n  \"enabledLabels\": [\"BWB\", \"WG\", \"OW\", \"LV\"],\n  \"requirePersoonsvorm\": true,\n  \"correctAnswer\": {\n    \"raw\": \"Vandaag maken wij de jaarplanner voor klas 2.\",\n    \"tokens\": [\n      {\"index\": 0, \"text\": \"Vandaag\", \"start\": 0, \"end\": 7}\n    ],\n    \"segments\": [\n      {\"startToken\": 0, \"endToken\": 0, \"label\": \"BWB\"},\n      {\"startToken\": 1, \"endToken\": 1, \"label\": \"WG\"},\n      {\"startToken\": 2, \"endToken\": 2, \"label\": \"OW\"},\n      {\"startToken\": 3, \"endToken\": 4, \"label\": \"LV\"},\n      {\"startToken\": 5, \"endToken\": 7, \"label\": \"BWB\"}\n    ],\n    \"persoonsvorm\": {\"startToken\": 1, \"endToken\": 1}\n  }\n}\n\nTokens are the sentence split on whitespace, so punctuation stays attached to the word before it (\"2.\" in the example is one token). List every token in `tokens`. The correctAnswer must be a gapless ordered partition of all tokens. Token indices are zero-based. Use only these labels: OW, WG, NG, LV, MV, VV, BWB, BVB, DB, VW. Keep enabledLabels to the labels that occur in the sentence. The persoonsvorm is a token range, usually one token inside WG or NG. Use null for persoonsvorm only when requirePersoonsvorm is false. Prefer one clear single-clause Dutch sentence.\n",
+  },
+  grading: {
+    enabled: true,
+    instructions: "The answer value is a string array. Segment entries use \"startToken-endToken:LABEL\", for example \"3-4:LV\". The persoonsvorm entry uses \"PV:startToken-endToken\", for example \"PV:1-1\". The richer parsed object may also be present at answer.context.parse.\n\nAward credit per model segment when the student's segment has exactly the same startToken/endToken and the same label. Award persoonsvorm credit when the token range matches exactly. Treat missing labels as incorrect. If the student's parse is a defensible grammatical alternative, mention that in feedback and suggest teacher review rather than marking it automatically wrong.\n",
+  },
+  scanning: {
+    instructions: "Convert the student's handwritten or printed sentence analysis into a string array answer value.\n\nThe expected answer value format is:\n[\"startToken-endToken:LABEL\", \"startToken-endToken:LABEL\", \"PV:startToken-endToken\"]\n\nUse the question settings sentence/correctAnswer tokens as the token index source. Tokens are the sentence split on whitespace, with punctuation attached to the word before it. Token indices are zero-based and must refer to the original sentence tokens, not to character positions. Segment entries must be ordered from left to right and must form the student's observed segmentation. A segment entry contains the inclusive token range, then a colon, then the zinsdeel label code.\n\nValid label codes are OW, WG, NG, LV, MV, VV, BWB, BVB, DB, and VW. If the student wrote the full Dutch label, convert it to the code:\nOnderwerp = OW; Werkwoordelijk gezegde = WG; Naamwoordelijk gezegde = NG; Lijdend voorwerp = LV; Meewerkend voorwerp = MV; Voorzetselvoorwerp = VV; Bijwoordelijke bepaling = BWB; Bijvoeglijke bepaling = BVB; Dubbelverbonden bepaling = DB; Voegwoord = VW.\n\nIf the student marked the persoonsvorm, add one final entry in the format \"PV:startToken-endToken\". Usually this is one token, for example \"PV:1-1\". If the question does not require the persoonsvorm or the student did not mark it, omit the PV entry.\n\nReturn only the string array. Do not include explanations, JSON objects, token text, comments, confidence scores, or markdown. Example for \"Vandaag maken wij de jaarplanner voor klas 2.\": [\"0-0:BWB\", \"1-1:WG\", \"2-2:OW\", \"3-4:LV\", \"5-7:BWB\", \"PV:1-1\"].\n",
+  },
+  timeEstimateMinutes: 4,
+  settings: [
+    {
+      id: "sentence",
+      type: "string",
+      name: {
+        en: "Sentence",
+        nl: "Zin",
+      },
+      description: "The single Dutch sentence the student should analyse.",
+      hidden: true,
+      required: true,
+    },
+    {
+      id: "enabledLabels",
+      type: "string-array",
+      name: {
+        en: "Enabled labels",
+        nl: "Beschikbare zinsdelen",
+      },
+      description: "Array of zinsdeel codes the student may choose from. Use only OW, WG, NG, LV, MV, VV, BWB, BVB, DB, VW.",
+      hidden: true,
+      required: true,
+      default: [
+        "OW",
+        "WG",
+        "LV",
+        "BWB",
+      ],
+    },
+    {
+      id: "requirePersoonsvorm",
+      type: "boolean",
+      name: {
+        en: "Mark finite verb",
+        nl: "Persoonsvorm markeren",
+      },
+      description: "Whether the student must underline the persoonsvorm.",
+      default: true,
+    },
+    {
+      id: "correctAnswer",
+      type: "string",
+      name: {
+        en: "Model answer",
+        nl: "Modelantwoord",
+      },
+      description: "SentenceParse JSON containing tokens, ordered gapless segments, labels, and persoonsvorm. This field is hidden from the student-facing front-end.",
+      hidden: true,
+      required: true,
+    },
+  ],
+  responseProcessing: {
+    condition: "=$join($.answer.value, '|') = $join($append($map($.question.settings.correctAnswer.segments, function($s) { $string($s.startToken) & '-' & $string($s.endToken) & ':' & $s.label }), $.question.settings.requirePersoonsvorm = false or $.question.settings.correctAnswer.persoonsvorm = null ? [] : ['PV:' & $string($.question.settings.correctAnswer.persoonsvorm.startToken) & '-' & $string($.question.settings.correctAnswer.persoonsvorm.endToken)]), '|')\n",
+    testCases: [
+      {
+        question: {
+          settings: {
+            sentence: "Vandaag maken wij de jaarplanner voor klas 2.",
+            requirePersoonsvorm: true,
+            correctAnswer: {
+              raw: "Vandaag maken wij de jaarplanner voor klas 2.",
+              tokens: [
+                {
+                  index: 0,
+                  text: "Vandaag",
+                  start: 0,
+                  end: 7,
+                },
+                {
+                  index: 1,
+                  text: "maken",
+                  start: 8,
+                  end: 13,
+                },
+                {
+                  index: 2,
+                  text: "wij",
+                  start: 14,
+                  end: 17,
+                },
+                {
+                  index: 3,
+                  text: "de",
+                  start: 18,
+                  end: 20,
+                },
+                {
+                  index: 4,
+                  text: "jaarplanner",
+                  start: 21,
+                  end: 32,
+                },
+                {
+                  index: 5,
+                  text: "voor",
+                  start: 33,
+                  end: 37,
+                },
+                {
+                  index: 6,
+                  text: "klas",
+                  start: 38,
+                  end: 42,
+                },
+                {
+                  index: 7,
+                  text: "2.",
+                  start: 43,
+                  end: 45,
+                },
+              ],
+              segments: [
+                {
+                  startToken: 0,
+                  endToken: 0,
+                  label: "BWB",
+                },
+                {
+                  startToken: 1,
+                  endToken: 1,
+                  label: "WG",
+                },
+                {
+                  startToken: 2,
+                  endToken: 2,
+                  label: "OW",
+                },
+                {
+                  startToken: 3,
+                  endToken: 4,
+                  label: "LV",
+                },
+                {
+                  startToken: 5,
+                  endToken: 7,
+                  label: "BWB",
+                },
+              ],
+              persoonsvorm: {
+                startToken: 1,
+                endToken: 1,
+              },
+            },
+          },
+        },
+        answer: {
+          value: [
+            "0-0:BWB",
+            "1-1:WG",
+            "2-2:OW",
+            "3-4:LV",
+            "5-7:BWB",
+            "PV:1-1",
+          ],
+        },
+        expectedOutcome: true,
+      },
+      {
+        question: {
+          settings: {
+            sentence: "Vandaag maken wij de jaarplanner voor klas 2.",
+            requirePersoonsvorm: true,
+            correctAnswer: {
+              segments: [
+                {
+                  startToken: 0,
+                  endToken: 0,
+                  label: "BWB",
+                },
+                {
+                  startToken: 1,
+                  endToken: 1,
+                  label: "WG",
+                },
+              ],
+              persoonsvorm: {
+                startToken: 1,
+                endToken: 1,
+              },
+            },
+          },
+        },
+        answer: {
+          value: [
+            "0-0:OW",
+            "1-1:WG",
+            "PV:1-1",
+          ],
+        },
+        expectedOutcome: false,
+      },
+    ],
+  },
+  export: {
+    qti3: {
+      interaction: {
+        type: "PortableCustomInteraction",
+        options: {
+          data: "=$.question.settings",
+        },
+      },
+    },
+  },
+  translations: {
+    sentence: {
+      en: "Sentence to analyze",
+      nl: "Zin om te ontleden",
+    },
+    "sentence-placeholder": {
+      en: "The quick fox jumps over the lazy dog.",
+      nl: "De snelle vos springt over de luie hond.",
+    },
+    "enabled-labels": {
+      en: "Labels students can choose",
+      nl: "Zinsdelen die leerlingen kunnen kiezen",
+    },
+    "require-pv": {
+      en: "Student must mark the persoonsvorm",
+      nl: "Leerling moet de persoonsvorm markeren",
+    },
+    "model-answer": {
+      en: "Model answer",
+      nl: "Modelantwoord",
+    },
+    "reset-parse": {
+      en: "Reset",
+      nl: "Reset",
+    },
+    "ai-parse": {
+      en: "Analyse with AI",
+      nl: "Ontleed met AI",
+    },
+    "ai-working": {
+      en: "Analysing...",
+      nl: "Bezig met ontleden...",
+    },
+    "assessment-help": {
+      en: "Click to split segments, then select a label for each segment.",
+      nl: "Klik om zinsdelen te splitsen, en selecteer daarna een label voor elk segment.",
+    },
+    "no-label": {
+      en: "No label",
+      nl: "Geen label",
+    },
+    "toggle-boundary": {
+      en: "Split or merge here",
+      nl: "Hier splitsen of samenvoegen",
+    },
+    "split-boundary": {
+      en: "Split",
+      nl: "Splits",
+    },
+    "merge-boundary": {
+      en: "Merge",
+      nl: "Samenvoegen",
+    },
+    "toggle-pv": {
+      en: "Mark as finite verb",
+      nl: "Markeer als persoonsvorm",
+    },
+    "pv-help": {
+      en: "Click the finite verb to underline it.",
+      nl: "Klik op de persoonsvorm om die te onderstrepen.",
+    },
+    persoonsvorm: {
+      en: "Finite verb",
+      nl: "Persoonsvorm",
+    },
+    "no-pv": {
+      en: "not marked",
+      nl: "niet gemarkeerd",
+    },
+    "correct-label": {
+      en: "Correct label",
+      nl: "Juist label",
+    },
+    "correct-pv": {
+      en: "Correct finite verb",
+      nl: "Juiste persoonsvorm",
+    },
+    "missing-sentence": {
+      en: "Add a sentence before students can answer this question.",
+      nl: "Voeg een zin toe voordat leerlingen deze vraag kunnen beantwoorden.",
+    },
+    "print-instructions": {
+      en: "Split the sentence into sentence parts, label each part, and underline the finite verb.",
+      nl: "Verdeel de zin in zinsdelen, benoem elk zinsdeel en onderstreep de persoonsvorm.",
+    },
+  },
+  icon,
+  previewData: preview,
+  previewImage,
+  readme,
+  components: {
+    assessment: Assessment,
+    print: Print,
+    results: Results,
+    settingsArea: SettingsArea,
+  },
+});
