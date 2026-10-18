@@ -1,0 +1,85 @@
+import { defineQuestionType } from "@examplary/apps";
+
+import Assessment from "./component-assessment";
+import Print from "./component-print";
+import icon from "./icon.svg";
+import preview from "./preview.yml";
+import previewImage from "./preview.png";
+import readme from "./README.md";
+
+export default defineQuestionType({
+  id: "examplary.default.essay",
+  name: {
+    en: "Essay",
+    nl: "Essay",
+  },
+  description: {
+    en: "Prompt the student to write a long answer, often using headings and text formatting.",
+    nl: "Vraag de leerling om een lang antwoord te schrijven, vaak met gebruik van kopjes en tekstopmaak.",
+  },
+  generation: {
+    enabled: true,
+    instructions: "The answer to this question is a long-form essay. The student may use headings and text formatting to structure their answer. Settings minWords and maxWords are optional. Set them to 0 if you don't want to use them; they must be finite numbers, since the settings are stored as JSON, which has no Infinity.\n",
+  },
+  grading: {
+    enabled: true,
+  },
+  timeEstimateMinutes: 15,
+  index: 500,
+  settings: [
+    {
+      id: "minWords",
+      name: {
+        en: "Minimum word count",
+        nl: "Minimaal aantal woorden",
+      },
+      type: "number",
+      placeholder: "0",
+      step: 50,
+    },
+    {
+      id: "maxWords",
+      name: {
+        en: "Maximum word count",
+        nl: "Maximaal aantal woorden",
+      },
+      type: "number",
+      placeholder: "0",
+      step: 50,
+    },
+  ],
+  export: {
+    qti3: {
+      interaction: {
+        type: "ExtendedTextInteraction",
+        options: {},
+      },
+    },
+  },
+  translations: {
+    "word-count_one": {
+      en: "{{count}} word",
+      nl: "{{count}} woord",
+    },
+    "word-count_other": {
+      en: "{{count}} words",
+      nl: "{{count}} woorden",
+    },
+    "word-count-min": {
+      en: "of {{min}} required",
+      nl: "van {{min}} vereist",
+    },
+    "word-count-max": {
+      en: "({{max}} maximum)",
+      nl: "({{max}} maximum)",
+    },
+  },
+  icon,
+  previewData: preview,
+  previewImage,
+  readme,
+  components: {
+    assessment: Assessment,
+    print: Print,
+  },
+});

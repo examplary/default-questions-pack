@@ -37,28 +37,8 @@ jobs:
         env:
           EXAMPLARY_API_KEY: ${{ secrets.EXAMPLARY_API_KEY }}
         run: |
-          # Upload each question type to Examplary staging
-          for dir in */; do
-            # Skip if the directory does not contain a question-type config file
-            if [ ! -f "$dir/question-type.json" ] && [ ! -f "$dir/question-type.yml" ]; then
-              continue
-            fi
+          # Bundle and upload the app and its question types to Examplary staging
+          npx @examplary/cli@latest app upload --host https://api-staging.examplary.ai
 
-            # Bundle and upload to Examplary
-            cd $dir
-            npx @examplary/cli@latest upload --host https://api-staging.examplary.ai
-            cd ..
-          done
-
-          # Upload each question type to Examplary production
-          for dir in */; do
-            # Skip if the directory does not contain a question-type config file
-            if [ ! -f "$dir/question-type.json" ] && [ ! -f "$dir/question-type.yml" ]; then
-              continue
-            fi
-
-            # Bundle and upload to Examplary
-            cd $dir
-            npx @examplary/cli@latest upload
-            cd ..
-          done
+          # Bundle and upload the app and its question types to Examplary production
+          npx @examplary/cli@latest app upload

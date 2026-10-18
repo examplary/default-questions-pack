@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 // Generates a stylised preview.png for every question type in the repo.
 //
-// For each directory containing a question-type.yml, this script:
+// For each directory containing a question-type.ts, this script:
 //   1. starts `exp preview` (port 5777) with that directory as cwd
 //   2. seeds the preview UI's localStorage with the sample payload from the
 //      directory's preview.yml (question + answer)
 //   3. restyles the page (hides the sidebar, gradient backdrop, icon header)
 //   4. screenshots the question card with headless Chrome at 2x
-//   5. writes preview.png next to question-type.yml
+//   5. writes preview.png next to question-type.ts
 //
 // Usage: node .github/scripts/generate-previews.mjs [type-dir ...]
 //   (no arguments = all question types)
@@ -98,9 +98,11 @@ const stopServer = async (child) => {
   await waitFor(async () => !(await isServerUp()), 10_000, "server shutdown");
 };
 
-const readQuestionTypeMeta = (dir) => {
-  const raw = readFileSync(join(dir, "question-type.yml"), "utf8");
-  const meta = parseYaml(raw);
+// The preview server evaluates question-type.ts, so ask it instead of parsing
+const readQuestionTypeMeta = async () => {
+  const res = await fetch(`${BASE_URL}/api/question-type`);
+  const meta = await res.json();
+  if (!res.ok) throw new Error(meta.error ?? "Could not load question type");
   return {
     id: meta.id,
     name: meta.name?.en ?? meta.id,
@@ -212,7 +214,7 @@ const capture = async (browser, typeDir, meta, sample) => {
 const main = async () => {
   const requested = process.argv.slice(2).map((d) => d.replace(/\/$/, ""));
   const allTypes = readdirSync(ROOT).filter((entry) =>
-    existsSync(join(ROOT, entry, "question-type.yml")),
+    existsSync(join(ROOT, entry, "question-type.ts")),
   );
   const types = requested.length
     ? requested.filter((t) => {
@@ -241,9 +243,9 @@ const main = async () => {
       process.stdout.write(`📸 ${type} ... `);
       let server;
       try {
-        const meta = readQuestionTypeMeta(typeDir);
         const sample = readPreviewSample(typeDir);
         server = await startServer(typeDir);
+        const meta = await readQuestionTypeMeta();
         await capture(browser, typeDir, meta, sample);
         console.log("done");
       } catch (error) {

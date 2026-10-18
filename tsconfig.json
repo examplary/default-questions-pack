@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": false,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "types": ["@examplary/apps/assets"]
+  },
+  "include": ["app.ts", "*/question-type.ts", "*/**/*.ts", "*/**/*.tsx"],
+  "exclude": ["node_modules"]
+}
