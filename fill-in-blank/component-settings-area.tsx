@@ -57,7 +57,8 @@ const SettingsAreaComponent: FrontendQuestionSettingsAreaComponent = ({
     <Blank
       defaultOpen={isNew}
       answers={[
-        correctAnswer[index] || "",
+        // Generated questions may have numbers as answers
+        String(correctAnswer[index] ?? ""),
         ...(alternativeAnswers[index] ?? []),
       ]}
       choices={choices[index] ?? []}

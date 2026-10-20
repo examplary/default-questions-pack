@@ -78,8 +78,12 @@ const blankNodeView = () => {
   return { dom, stopEvent: () => true };
 };
 
-// Rendered back to `___`, so the stored question text still contains its
-// blanks. Wrapped in a span, as ProseMirror reads a bare string as a tag name.
+// ProseMirror can't render a node as bare text (it reads a string as a tag
+// name), so the editor's HTML has each blank as this element, which is
+// turned back into `___` before the text is stored
+const BLANK_HTML = `<span data-blank="">${BLANK}</span>`;
+const toStoredText = (html: string) => html.replaceAll(BLANK_HTML, BLANK);
+
 const createBlankNode = () =>
   TiptapNode.create({
     name: "blank",
@@ -94,7 +98,7 @@ const createBlankNode = () =>
       id: { default: null, rendered: false, parseHTML: () => null },
     }),
 
-    renderHTML: () => ["span", BLANK],
+    renderHTML: () => ["span", { "data-blank": "" }, BLANK],
     renderText: () => BLANK,
 
     addProseMirrorPlugins: () => [
@@ -255,6 +259,7 @@ export const BlankEditor = ({
 
   // Set on every change, right before tiptap calls `onChange` for it
   const blankOrder = useRef<BlankOrder | null>(null);
+  const editorHtml = useRef("");
   const onBlankOrder = useCallback((order: BlankOrder | null) => {
     blankOrder.current = order;
   }, []);
@@ -295,9 +300,16 @@ export const BlankEditor = ({
       }}
     >
       <RichTextField
-        value={value}
-        onChange={(value: string) => {
-          onChange(value, blankOrder.current);
+        // Given back the editor's own HTML for the text it last stored, as
+        // tiptap reloads the content whenever the value differs from it
+        value={
+          toStoredText(editorHtml.current) === value
+            ? editorHtml.current
+            : value
+        }
+        onChange={(html: string) => {
+          editorHtml.current = html;
+          onChange(toStoredText(html), blankOrder.current);
           blankOrder.current = null;
         }}
         placeholder={placeholder}
