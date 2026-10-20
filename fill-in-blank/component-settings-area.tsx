@@ -1,122 +1,126 @@
-import {
-  cn,
-  FrontendQuestionSettingsAreaComponent,
-  Input,
-  RichTextField,
-} from "@examplary/ui";
-import { Fragment } from "react";
+import { FrontendQuestionSettingsAreaComponent } from "@examplary/ui";
+import { useRef } from "react";
 
-import { parseChoices } from "./shared";
+import { Blank } from "./blank";
+import {
+  BlankEditor,
+  supportsBlankEditor,
+  type BlankEditorHandle,
+  type BlankOrder,
+} from "./blank-editor";
+import LegacySettingsAreaComponent from "./legacy-settings-area";
+import { countBlanks, parseChoices } from "./shared";
 
 const SettingsAreaComponent: FrontendQuestionSettingsAreaComponent = ({
   settings,
   setSetting,
+  setMultipleSettings,
   t,
 }) => {
+  const text = settings.text || "";
+  const blanks = countBlanks(text);
   const correctAnswer = (settings.correctAnswer as string[]) || [];
   const choices = parseChoices(settings.choices);
+  const alternativeAnswers = parseChoices(settings.alternativeAnswers);
 
-  const setChoices = (index: number, value: string) => {
-    const next = [...choices];
-    next[index] = value
-      .split(";")
-      .map((choice) => choice.trim())
-      .filter(Boolean);
-    setSetting(
-      "choices",
-      Array.from({ length: blanks }, (_, i) => next[i] ?? []),
+  // Fills the whole list up to the number of blanks, as holes would be saved
+  // as null and break response processing
+  const replaceAt = <T,>(list: T[], index: number, value: T, empty: T) =>
+    Array.from({ length: blanks }, (_, i) =>
+      i === index ? value : (list[i] ?? empty),
     );
-  };
 
-  const insertBlank = () => {
-    const current = settings.text || "";
-    setSetting("text", current + " ___ ");
-  };
-
-  const blanks = (settings.text || "").split("___").length - 1;
+  // Moves the settings of each blank along with it, when blanks are added or
+  // removed in between others
+  const reorder = <T,>(list: T[], order: BlankOrder, empty: T) =>
+    order.map((index) =>
+      typeof index === "number" ? (list[index] ?? empty) : empty,
+    );
 
   // Mirrors the normalisation in responseProcessing, so a dropdown blank is
-  // only flagged when no option could ever be graded as correct
+  // only flagged when an answer could never be picked
   const normalise = (value: string) =>
     settings.exactValuesCaseInsensitive === true
       ? value.trim().toLowerCase()
       : value.trim();
 
-  const isAnswerMissingFromChoices = (index: number) => {
-    const answer = correctAnswer[index]?.trim();
+  const isMissingFromChoices = (index: number) => (answer: string) => {
     const options = choices[index] ?? [];
-    if (!answer || options.length === 0) return false;
+    if (!answer.trim() || options.length === 0) return false;
     return !options.some((option) => normalise(option) === normalise(answer));
   };
 
+  const editor = useRef<BlankEditorHandle>(null);
+
+  // A blank that was just added opens straight away, to fill in its answer
+  const renderBlank = (index: number, isNew: boolean) => (
+    <Blank
+      defaultOpen={isNew}
+      answers={[
+        correctAnswer[index] || "",
+        ...(alternativeAnswers[index] ?? []),
+      ]}
+      choices={choices[index] ?? []}
+      isMissingFromChoices={isMissingFromChoices(index)}
+      // The first answer stays in `correctAnswer`, which is what generation,
+      // export and the review placeholders use; the others are alternatives
+      onAnswersChange={([answer = "", ...alternatives]) =>
+        setMultipleSettings({
+          correctAnswer: replaceAt(correctAnswer, index, answer, ""),
+          alternativeAnswers: replaceAt(
+            alternativeAnswers,
+            index,
+            alternatives.map((value) => value.trim()).filter(Boolean),
+            [],
+          ),
+        })
+      }
+      onChoicesChange={(value) =>
+        setSetting("choices", replaceAt(choices, index, value, []))
+      }
+      t={t}
+    />
+  );
+
   return (
-    <div className="space-y-5">
-      <div>
-        <label className="block font-semibold font-heading mb-1">
-          {t("text")}
-        </label>
-        <RichTextField
-          value={settings.text || ""}
-          onChange={(value) => setSetting("text", value)}
-          placeholder={t("placeholder")}
-          className="w-full"
-        />
-        <div className="text-sm text-zinc-500 mt-1.5">
-          {t("help")}{" "}
-          <button
-            className="text-black underline cursor-pointer"
-            onClick={insertBlank}
-          >
-            {t("insert-blank")}
-          </button>
-        </div>
+    <div>
+      <label className="block font-semibold font-heading mb-1">
+        {t("text")}
+      </label>
+      <BlankEditor
+        ref={editor}
+        value={text}
+        onChange={(value, order) =>
+          order
+            ? setMultipleSettings({
+                text: value,
+                // New blanks can start off with an answer
+                correctAnswer: order.map((index) =>
+                  typeof index === "number"
+                    ? (correctAnswer[index] ?? "")
+                    : index,
+                ),
+                alternativeAnswers: reorder(alternativeAnswers, order, []),
+                choices: reorder(choices, order, []),
+              })
+            : setSetting("text", value)
+        }
+        placeholder={t("placeholder")}
+        renderBlank={renderBlank}
+      />
+      <div className="text-sm text-zinc-500 mt-1.5">
+        {t("help-chips")}{" "}
+        <button
+          className="text-black underline cursor-pointer"
+          onClick={() => editor.current?.insertBlank()}
+        >
+          {t("insert-blank")}
+        </button>
       </div>
-      {blanks > 0 && (
-        <div className="grid grid-cols-[auto_1fr_1fr] items-center gap-x-1 gap-y-2">
-          <span />
-          <label className="font-semibold font-heading">
-            {blanks > 1 ? t("correct-answers") : t("correct-answer")}
-          </label>
-          <label className="font-medium font-heading text-zinc-500">
-            {t("choices")}
-          </label>
-          {Array.from({ length: blanks }).map((_, index) => {
-            const invalid = isAnswerMissingFromChoices(index);
-            return (
-              <Fragment key={index}>
-                <span>{index + 1}.</span>
-                <Input
-                  value={correctAnswer[index] || ""}
-                  onChange={(e) => {
-                    const next = [...correctAnswer];
-                    next[index] = e.target.value;
-                    setSetting("correctAnswer", next);
-                  }}
-                  aria-invalid={invalid}
-                  title={invalid ? t("answer-not-in-choices") : undefined}
-                  className={cn(
-                    "min-w-24",
-                    invalid && "border-red-500 focus:border-red-500",
-                  )}
-                />
-                <Input
-                  defaultValue={choices[index]?.join("; ") ?? ""}
-                  onBlur={(e) => setChoices(index, e.target.value)}
-                  placeholder={t("choices-placeholder")}
-                  className="min-w-24"
-                />
-                {invalid && (
-                  <div className="col-start-2 col-span-2 -mt-1 text-xs text-red-600">
-                    {t("answer-not-in-choices")}
-                  </div>
-                )}
-              </Fragment>
-            );
-          })}
-        </div>
-      )}
     </div>
   );
 };
 
-export default SettingsAreaComponent;
+export default supportsBlankEditor
+  ? SettingsAreaComponent
+  : LegacySettingsAreaComponent;

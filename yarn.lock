@@ -489,7 +489,8 @@ __metadata:
     "@dnd-kit/sortable": "npm:^10.0.0"
     "@dnd-kit/utilities": "npm:^3.2.2"
     "@examplary/cli": "npm:^1.11.0"
-    "@examplary/ui": "npm:^1.67.2"
+    "@examplary/schemas": "npm:^1.27.0"
+    "@examplary/ui": "npm:^1.83.0"
     "@testing-library/dom": "npm:^10.4.1"
     "@testing-library/react": "npm:^16.3.2"
     "@types/react": "npm:>=19.2.0"
@@ -513,6 +514,15 @@ __metadata:
   dependencies:
     zod: "npm:^4.3.6"
   checksum: 10c0/c6cf347254489cba7508c59f948c5b590fcb7401bd140d67d51676cc8d8e3d1416070d8e0d2f58d2440677f23ca6f510f6158ce6abb31911baf4f1ccbc54b295
+  languageName: node
+  linkType: hard
+
+"@examplary/schemas@npm:^1.27.0":
+  version: 1.27.0
+  resolution: "@examplary/schemas@npm:1.27.0"
+  dependencies:
+    zod: "npm:^4.3.6"
+  checksum: 10c0/362140d1b87c6d472cc9a565943b71ade9135d2db505e90844b1e0d4b39cd27b73beb4748e3528b18edf5d5a7c38467566dffad141255d9953112fa951c0e401
   languageName: node
   linkType: hard
 
@@ -596,9 +606,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@examplary/ui@npm:^1.67.2":
-  version: 1.67.2
-  resolution: "@examplary/ui@npm:1.67.2"
+"@examplary/ui@npm:^1.83.0":
+  version: 1.83.0
+  resolution: "@examplary/ui@npm:1.83.0"
   dependencies:
     "@dnd-kit/core": "npm:^6.3.1"
     "@dnd-kit/modifiers": "npm:^9.0.0"
@@ -632,39 +642,34 @@ __metadata:
     "@tiptap/extension-italic": "npm:^3.11.1"
     "@tiptap/extension-link": "npm:^3.22.5"
     "@tiptap/extension-placeholder": "npm:^3.13.0"
-    "@tiptap/extension-table": "npm:^3.11.1"
+    "@tiptap/extension-table": "npm:^3.31.3"
     "@tiptap/extension-typography": "npm:^3.19.0"
     "@tiptap/extensions": "npm:^3.17.1"
     "@tiptap/pm": "npm:^3.21.0"
     "@tiptap/react": "npm:^3.15.3"
     "@tiptap/starter-kit": "npm:^3.11.1"
     "@tiptap/y-tiptap": "npm:^3.0.2"
-    axios: "npm:^1.18.1"
+    axios: "npm:^1.20.0"
     chrono-node: "npm:^2.9.1"
     class-variance-authority: "npm:^0.7.1"
-    clsx: "npm:^2.1.1"
     cmdk: "npm:^1.1.1"
+    cn: "npm:^0.4.0"
     date-fns: "npm:^4.4.0"
     fuse.js: "npm:^7.1.0"
     i18next: "npm:^26.3.4"
-    i18next-browser-languagedetector: "npm:^8.2.0"
-    katex: "npm:^0.16.44"
-    lucide-react: "npm:^0.575.0"
-    lucide-static: "npm:^0.575.0"
-    mathlive: "npm:0.108.3"
+    input-otp: "npm:^1.5.0"
+    lucide-react: "npm:^1.39.0"
+    lucide-static: "npm:^1.42.0"
+    mathlive: "npm:^0.110.0"
     motion: "npm:^12.35.0"
-    nanoid: "npm:^5.1.16"
     radix-ui: "npm:^1.4.3"
     react-colorful: "npm:^5.6.1"
-    react-day-picker: "npm:^10.0.1"
-    react-hook-form: "npm:^7.71.2"
+    react-day-picker: "npm:^10.0.2"
     react-hot-toast: "npm:^2.6.0"
-    react-hotkeys-hook: "npm:^5.2.1"
+    react-hotkeys-hook: "npm:^5.3.3"
     react-i18next: "npm:^17.0.8"
     react-image-crop: "npm:^11.0.10"
     react-resizable-panels: "npm:^4.11.1"
-    tailwind-animate: "npm:^0.2.10"
-    tailwind-merge: "npm:^3.4.0"
     tailwindcss-animate: "npm:^1.0.7"
     tiptap-inline-comments: "npm:^1.2.0"
     usehooks-ts: "npm:^3.1.1"
@@ -674,7 +679,7 @@ __metadata:
   peerDependencies:
     react: ">=18.0.0"
     react-dom: ">=18.0.0"
-  checksum: 10c0/fae27fc0e26fee127f1e55580be65cf3b419375a7ee56811d85fb601a35a98d405add03eb0e943632df7065f5a1981db7156761c11c70a839284864ce028b331
+  checksum: 10c0/9b15a5e0ab4118ee39cb56777acf444022520e18f6b7a1252ef53e39f10befbd8fb1d29310c998d21f0b3bc1e0c01e488457c87399780dce66da18da48a743f1
   languageName: node
   linkType: hard
 
@@ -2800,6 +2805,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tiptap/extension-table@npm:^3.31.3":
+  version: 3.32.0
+  resolution: "@tiptap/extension-table@npm:3.32.0"
+  peerDependencies:
+    "@tiptap/core": 3.32.0
+    "@tiptap/pm": 3.32.0
+  checksum: 10c0/6fe757e637eeee9bf52e6cad028837844bf072a26e774f47a87519b32a3ed828d9e44dbc7e15347bab8625e31f0fefc2faa37bd4f55fad0ba8e1999b34ae13b6
+  languageName: node
+  linkType: hard
+
 "@tiptap/extension-text@npm:^3.27.3":
   version: 3.27.3
   resolution: "@tiptap/extension-text@npm:3.27.3"
@@ -3165,6 +3180,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axios@npm:^1.20.0":
+  version: 1.20.0
+  resolution: "axios@npm:1.20.0"
+  dependencies:
+    follow-redirects: "npm:^1.16.0"
+    form-data: "npm:^4.0.6"
+    https-proxy-agent: "npm:^5.0.1"
+    proxy-from-env: "npm:^2.1.0"
+  checksum: 10c0/976088acf532286356f4c2e65df1ef47ba7da3936d83e928d0d64357bbf5370456abd3eb5826c15df322335fcb1fe200d4a84b4fcf20ffccdd63b40d80fa495c
+  languageName: node
+  linkType: hard
+
 "bidi-js@npm:^1.0.3":
   version: 1.0.3
   resolution: "bidi-js@npm:1.0.3"
@@ -3265,6 +3292,15 @@ __metadata:
     react: ^18 || ^19 || ^19.0.0-rc
     react-dom: ^18 || ^19 || ^19.0.0-rc
   checksum: 10c0/5605ac4396ec9bc65c82f954da19dd89a0636a54026df72780e2470da1381f9d57434a80a53f2d57eaa4e759660a3ebba9232b74258dc09970576591eae03116
+  languageName: node
+  linkType: hard
+
+"cn@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "cn@npm:0.4.0"
+  bin:
+    cn: bin/cn.mjs
+  checksum: 10c0/e71351cdceb7dbc9b468dcb9cacc304212532fb6bb4545979426f22791f5c4738f37d13825eb68172ae355fbe8afc30386371753d093f1031f17f35a8d10f303
   languageName: node
   linkType: hard
 
@@ -3658,7 +3694,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"form-data@npm:^4.0.5":
+"form-data@npm:^4.0.5, form-data@npm:^4.0.6":
   version: 4.0.6
   resolution: "form-data@npm:4.0.6"
   dependencies:
@@ -3876,6 +3912,16 @@ __metadata:
     typescript:
       optional: true
   checksum: 10c0/5aa4159138629da06e91f611ea485d7a1fc8a3d8f1a3ba03654663da0b10e629988608aec071427d89360e6bbcd013b078ce4e6c22631e2cd7c3bb9a94f1e903
+  languageName: node
+  linkType: hard
+
+"input-otp@npm:^1.5.0":
+  version: 1.5.0
+  resolution: "input-otp@npm:1.5.0"
+  peerDependencies:
+    react: ^16.8 || ^17.0 || ^18.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17.0 || ^18.0 || ^19.0.0 || ^19.0.0-rc
+  checksum: 10c0/08e43da5f654a5b93051c92c83a9af6aed8313b218488de41ddb099947e2c9cf6c42e295beb9ad05473e8d1713af64f85fae9185ee0139368702f8a5527b8334
   languageName: node
   linkType: hard
 
@@ -4176,10 +4222,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lucide-react@npm:^1.39.0":
+  version: 1.58.0
+  resolution: "lucide-react@npm:1.58.0"
+  peerDependencies:
+    "@types/react": "*"
+    react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/2206d52aef1224292bf41285b7c1d224e3718bc9bbb1ae57fbaba346ec7600793b594730288ed065aa3165c98966bee275c8765ab1802620867a18787bfdf20c
+  languageName: node
+  linkType: hard
+
 "lucide-static@npm:^0.575.0":
   version: 0.575.0
   resolution: "lucide-static@npm:0.575.0"
   checksum: 10c0/77d4de1caa08c8e4968ffb70ecdd2a67d51b32db83c8e1dfe3f2c343b38ffa68e4fde204a4aacff399ecba5a91b549a26e5ea9faa311467da0027683d8ede34c
+  languageName: node
+  linkType: hard
+
+"lucide-static@npm:^1.42.0":
+  version: 1.58.0
+  resolution: "lucide-static@npm:1.58.0"
+  checksum: 10c0/0eac1c03f51514932b5a6b74b2570ac6bc798e174b17ef8980864b66f62b8fb1839ad796e5e249a7554f8e60ebc9d054a3165ea1ac14efc953499b9d08f286f8
   languageName: node
   linkType: hard
 
@@ -4751,6 +4817,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-day-picker@npm:^10.0.2":
+  version: 10.0.2
+  resolution: "react-day-picker@npm:10.0.2"
+  dependencies:
+    "@date-fns/tz": "npm:^1.4.1"
+    date-fns: "npm:^4.1.0"
+  peerDependencies:
+    "@types/react": ">=16.8.0"
+    react: ">=16.8.0"
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: 10c0/3baa75fa21625357656b15425384b21729796c0ae5b2e638d4e7a08f01c3d31db051a1fb21da784f87862ce917383fddfe713164718b3899cc7b47314e46f4ec
+  languageName: node
+  linkType: hard
+
 "react-dom@npm:^19.2.8":
   version: 19.2.8
   resolution: "react-dom@npm:19.2.8"
@@ -4784,7 +4866,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-hotkeys-hook@npm:^5.2.1":
+"react-hotkeys-hook@npm:^5.2.1, react-hotkeys-hook@npm:^5.3.3":
   version: 5.3.3
   resolution: "react-hotkeys-hook@npm:5.3.3"
   peerDependencies:
