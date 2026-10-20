@@ -55,6 +55,18 @@ settings:
     hidden: true
     required: true
 
+  - id: alternativeAnswers
+    type: custom
+    name: Alternative answers per blank
+    description: 'Optional. For each blank, other answers that are accepted besides its entry in `correctAnswer`, e.g. `[["Parijs"], []]`. An empty list (or no entry) accepts only the correct answer.'
+    hidden: true
+    schema:
+      type: array
+      items:
+        type: array
+        items:
+          type: string
+
   - id: choices
     type: custom
     name: Choices per blank
@@ -87,12 +99,42 @@ responseProcessing:
   condition: |
     =(
       $caseInsensitive := $.question.settings.exactValuesCaseInsensitive = true;
-      $normalise := function($v) { $caseInsensitive ? $trim($lowercase($v)) : $trim($v) };
-      $given := $map($.answer.value, $normalise);
-      $expected := $map($.question.settings.correctAnswer, $normalise);
-      $.question.settings.exactOrder = false
-        ? $join($sort($given), '|') = $join($sort($expected), '|')
-        : $join($given, '|') = $join($expected, '|')
+      /* An empty blank may have been saved as null, and generated answers may be numbers */
+      $normalise := function($v) {(
+        $text := $type($v) = "null" ? "" : $type($v) = "number" ? $string($v) : $v;
+        $caseInsensitive ? $trim($lowercase($text)) : $trim($text)
+      )};
+      $correctAnswer := $.question.settings.correctAnswer;
+      $alternatives := $.question.settings.alternativeAnswers;
+      $type($alternatives) != "array" or $count($reduce($alternatives, $append, [])) = 0
+        ? (
+          /* As before alternative answers were added, so that existing questions are graded exactly as they were */
+          $given := $map($.answer.value, $normalise);
+          $expected := $map($correctAnswer, $normalise);
+          $.question.settings.exactOrder = false
+            ? $join($sort($given), '|') = $join($sort($expected), '|')
+            : $join($given, '|') = $join($expected, '|')
+        )
+        : (
+          /* Normalised up front, as looking up a null by its index gives nothing */
+          $given := $map($.answer.value, $normalise);
+          $expected := $map($correctAnswer, $normalise);
+          $blanks := $count($correctAnswer);
+          $isAccepted := function($value, $blank) {
+            $value in $append($expected[$blank], $map($alternatives[$blank], $normalise))
+          };
+          /* Without exact order, every answer needs its own blank that accepts it */
+          $assign := function($i, $used) {
+            $i = $blanks or $count($filter([0..$blanks - 1], function($blank) {
+              $not($blank in $used) and $isAccepted($given[$i], $blank) and $assign($i + 1, $append($used, $blank))
+            })) > 0
+          };
+          $blanks > 0 and $count($given) = $blanks and (
+            $.question.settings.exactOrder = false
+              ? $assign(0, [])
+              : $count($filter([0..$blanks - 1], function($blank) { $not($isAccepted($given[$blank], $blank)) })) = 0
+          )
+        )
     )
   testCases:
     - question:
@@ -202,6 +244,111 @@ responseProcessing:
         }
       answer: { value: [" madrid", "paris "] }
       expectedOutcome: true
+    - question:
+        {
+          settings:
+            {
+              text: "Capital of France is ___ and Spain is ___",
+              correctAnswer: ["Paris", "Madrid"],
+              alternativeAnswers: [[], []],
+              exactOrder: false,
+            },
+        }
+      answer: { value: ["Madrid", "Paris"] }
+      expectedOutcome: true
+    - question:
+        {
+          settings:
+            {
+              text: "Capital of France is ___ and Spain is ___",
+              correctAnswer: ["Paris", "Madrid"],
+            },
+        }
+      answer: { value: ["Paris", null] }
+      expectedOutcome: false
+    - question:
+        {
+          settings:
+            { text: "Fill in ___ and ___", correctAnswer: ["Paris", null] },
+        }
+      answer: { value: ["Paris", ""] }
+      expectedOutcome: true
+    - question:
+        { settings: { text: "It ended in ___", correctAnswer: [1945] } }
+      answer: { value: [" 1945 "] }
+      expectedOutcome: true
+    - question: { settings: { text: "No blanks", correctAnswer: [] } }
+      answer: { value: [] }
+      expectedOutcome: false
+    - question:
+        {
+          settings:
+            {
+              text: "Capital of France is ___",
+              correctAnswer: ["Paris"],
+              alternativeAnswers: [["Parijs", "Paname"]],
+            },
+        }
+      answer: { value: ["Paname"] }
+      expectedOutcome: true
+    - question:
+        {
+          settings:
+            {
+              text: "Capital of France is ___",
+              correctAnswer: ["Paris"],
+              alternativeAnswers: [["Parijs"]],
+              exactValuesCaseInsensitive: true,
+            },
+        }
+      answer: { value: [" PARIJS "] }
+      expectedOutcome: true
+    - question:
+        {
+          settings:
+            {
+              text: "Capital of France is ___ and Spain is ___",
+              correctAnswer: ["Paris", "Madrid"],
+              alternativeAnswers: [["Parijs"], []],
+            },
+        }
+      answer: { value: ["Madrid", "Parijs"] }
+      expectedOutcome: false
+    - question:
+        {
+          settings:
+            {
+              text: "Capital of France is ___ and Spain is ___",
+              correctAnswer: ["Paris", "Madrid"],
+              alternativeAnswers: [["Parijs"], []],
+              exactOrder: false,
+            },
+        }
+      answer: { value: ["Madrid", "Parijs"] }
+      expectedOutcome: true
+    - question:
+        {
+          settings:
+            {
+              text: "___, ___ and ___",
+              correctAnswer: ["a", "b", "c"],
+              alternativeAnswers: [["x"], [], []],
+              exactOrder: false,
+            },
+        }
+      answer: { value: ["c", "x", "x"] }
+      expectedOutcome: false
+    - question:
+        {
+          settings:
+            {
+              text: "Capital of France is ___ and Spain is ___",
+              correctAnswer: ["Paris", "Madrid"],
+              alternativeAnswers: [["Parijs"], []],
+            },
+        }
+      answer: { value: ["Parijs", null] }
+      expectedOutcome: false
 
 export:
   qti3:
@@ -231,6 +378,9 @@ translations:
   help:
     en: Use three underscores (___) to indicate a blank.
     nl: Gebruik drie onderstrepingstekens (___) om een lege plek aan te geven.
+  help-chips:
+    en: Type three underscores (___) to add a blank, then click it to set the answer.
+    nl: Typ drie onderstrepingstekens (___) om een lege plek toe te voegen en klik erop om het antwoord in te stellen.
   insert-blank:
     en: Insert blank
     nl: Lege plek invoegen
@@ -240,6 +390,18 @@ translations:
   correct-answers:
     en: Correct answers
     nl: Correct antwoorden
+  add-answer:
+    en: Add answer
+    nl: Antwoord toevoegen
+  add-option:
+    en: Add option
+    nl: Optie toevoegen
+  remove:
+    en: Remove
+    nl: Verwijderen
+  show-as-dropdown:
+    en: Show as dropdown
+    nl: Toon als keuzemenu
   choices:
     en: Dropdown options (optional)
     nl: Keuzemenu-opties (optioneel)
