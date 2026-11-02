@@ -24,6 +24,10 @@ generation:
     Settings should look like this: {"options": ["Option 1", "Option 2", "Option 3"], "correctAnswer": ["Option 2", "Option 3"]}.
     Make sure the `correctAnswer` is always set, and EXACTLY matches the corresponding values from the `options` array, and that all options are unique.
     Do not include any distractors or incorrect options in the `correctAnswer` array.
+    The correct answers must not stand out from the distractors by their form: all options should have a similar length, level of detail and grammatical structure.
+    The correct answers should not be noticeably longer, more precise or more qualified than the distractors, and should not be the only options that repeat wording from the question.
+    To achieve this, write the correct answers first, then write each distractor to match their length and level of detail. Finally, check that a student without subject knowledge could not pick out the correct answers based on their form alone.
+    Vary the positions of the correct answers in the `options` array across questions.
     Also include exactly one scoring criteria, which should just be 'Correct answer selected', and be worth at least one point unless specified otherwise.
     If the option is a math equation, it should be formatted like such: <inline-math>2x + 3 = 7</inline-math> - this ensures it will be displayed LaTeX-like.
     Just using LaTeX formatting without the <inline-math> tags will not render the equation correctly.
