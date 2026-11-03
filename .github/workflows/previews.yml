@@ -6,6 +6,7 @@ on:
     paths:
       - "**/question-type.yml"
       - "**/preview.yml"
+      - "**/preview.*.yml"
       - "**/*.tsx"
       - "**/icon.svg"
       - ".github/scripts/**"
@@ -52,7 +53,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add '*/preview.png'
+          git add '*/preview.png' '*/preview.*.png'
           if git diff --cached --quiet; then
             echo "No preview changes to commit"
           else

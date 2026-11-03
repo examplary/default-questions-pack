@@ -1,13 +1,15 @@
 #!/usr/bin/env node
-// Generates a stylised preview.png for every question type in the repo.
+// Generates a stylised preview.png (English) and preview.nl.png (Dutch) for
+// every question type in the repo.
 //
 // For each directory containing a question-type.yml, this script:
 //   1. starts `exp preview` (port 5777) with that directory as cwd
-//   2. seeds the preview UI's localStorage with the sample payload from the
-//      directory's preview.yml (question + answer)
+//   2. for each language, seeds the preview UI's localStorage with the sample
+//      payload from the directory's preview.yml (question + answer), with
+//      preview.<lang>.yml merged over it if present
 //   3. restyles the page (hides the sidebar, gradient backdrop, icon header)
 //   4. screenshots the question card with headless Chrome at 2x
-//   5. writes preview.png next to question-type.yml
+//   5. writes preview.png / preview.<lang>.png next to question-type.yml
 //
 // Usage: node .github/scripts/generate-previews.mjs [type-dir ...]
 //   (no arguments = all question types)
@@ -29,6 +31,12 @@ import { parse as parseYaml } from "yaml";
 const ROOT = resolve(import.meta.dirname, "..", "..");
 const PORT = 5777;
 const BASE_URL = `http://localhost:${PORT}`;
+
+// English is the default and writes preview.png; other languages write
+// preview.<lang>.png.
+const LANGUAGES = ["en", "nl"];
+const previewFileName = (lang, ext) =>
+  lang === "en" ? `preview.${ext}` : `preview.${lang}.${ext}`;
 
 const CHROME_CANDIDATES = [
   process.env.CHROME_PATH,
@@ -103,20 +111,42 @@ const readQuestionTypeMeta = (dir) => {
   const meta = parseYaml(raw);
   return {
     id: meta.id,
-    name: meta.name?.en ?? meta.id,
+    name: meta.name,
     icon: meta.icon,
     components: Object.keys(meta.components ?? {}),
   };
 };
 
-const readPreviewSample = (dir) => {
-  const path = join(dir, "preview.yml");
-  if (!existsSync(path)) return { question: {}, answer: {} };
-  const sample = parseYaml(readFileSync(path, "utf8"));
+const localizedName = (meta, lang) =>
+  typeof meta.name === "string"
+    ? meta.name
+    : (meta.name?.[lang] ?? meta.name?.en ?? meta.id);
+
+const readYaml = (path) =>
+  existsSync(path) ? (parseYaml(readFileSync(path, "utf8")) ?? {}) : {};
+
+// Objects are merged key by key; arrays and scalars in `override` replace
+// those in `base`.
+const isPlainObject = (v) =>
+  v !== null && typeof v === "object" && !Array.isArray(v);
+const deepMerge = (base, override) => {
+  if (!isPlainObject(base) || !isPlainObject(override)) return override;
+  const merged = { ...base };
+  for (const [key, value] of Object.entries(override)) {
+    merged[key] = key in base ? deepMerge(base[key], value) : value;
+  }
+  return merged;
+};
+
+const readPreviewSample = (dir, lang) => {
+  let sample = readYaml(join(dir, "preview.yml"));
+  if (lang !== "en") {
+    sample = deepMerge(sample, readYaml(join(dir, previewFileName(lang, "yml"))));
+  }
   return { question: sample?.question ?? {}, answer: sample?.answer ?? {} };
 };
 
-const capture = async (browser, typeDir, meta, sample) => {
+const capture = async (browser, typeDir, meta, sample, lang) => {
   const page = await browser.newPage();
   try {
     await page.setViewport({ width: 1400, height: 1000, deviceScaleFactor: 2 });
@@ -128,7 +158,7 @@ const capture = async (browser, typeDir, meta, sample) => {
     const question = {
       id: "q_preview",
       type: meta.id,
-      title: sample.question.title ?? meta.name,
+      title: sample.question.title ?? localizedName(meta, lang),
       description: sample.question.description ?? "",
       settings: sample.question.settings ?? {},
     };
@@ -146,7 +176,11 @@ const capture = async (browser, typeDir, meta, sample) => {
       },
     );
 
-    await page.goto(BASE_URL, { waitUntil: "networkidle0", timeout: 60_000 });
+    // The preview UI's i18next language detector reads `?lng=` first.
+    await page.goto(`${BASE_URL}/?lng=${lang}`, {
+      waitUntil: "networkidle0",
+      timeout: 60_000,
+    });
     await page.waitForSelector("#root aside", { timeout: 30_000 });
 
     // Give the dynamically imported component (and math fonts, images, …)
@@ -199,7 +233,7 @@ const capture = async (browser, typeDir, meta, sample) => {
 
     await sleep(300);
     await page.screenshot({
-      path: join(typeDir, "preview.png"),
+      path: join(typeDir, previewFileName(lang, "png")),
       clip,
       captureBeyondViewport: true,
       omitBackground: true,
@@ -242,9 +276,11 @@ const main = async () => {
       let server;
       try {
         const meta = readQuestionTypeMeta(typeDir);
-        const sample = readPreviewSample(typeDir);
         server = await startServer(typeDir);
-        await capture(browser, typeDir, meta, sample);
+        for (const lang of LANGUAGES) {
+          const sample = readPreviewSample(typeDir, lang);
+          await capture(browser, typeDir, meta, sample, lang);
+        }
         console.log("done");
       } catch (error) {
         failures.push(type);

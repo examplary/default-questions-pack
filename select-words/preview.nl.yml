@@ -1,0 +1,8 @@
+question:
+  title: Werkwoorden
+  description: Selecteer alle werkwoorden in de zin.
+  settings:
+    text: "<p>De [monteur] [controleerde] het [apparaat] en [verving] de kapotte [sensor].</p>"
+    correctAnswer: ["controleerde", "verving"]
+answer:
+  value: ["controleerde", "verving"]

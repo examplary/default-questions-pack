@@ -1,0 +1,17 @@
+question:
+  title: Zet de gebeurtenissen op volgorde
+  description: Zet deze historische gebeurtenissen in chronologische volgorde.
+  settings:
+    options:
+      - Val van het West-Romeinse Rijk
+      - De kruistochten
+      - De renaissance
+      - De Franse Revolutie
+      - De Eerste Wereldoorlog
+answer:
+  value:
+    - Val van het West-Romeinse Rijk
+    - De kruistochten
+    - De renaissance
+    - De Franse Revolutie
+    - De Eerste Wereldoorlog
