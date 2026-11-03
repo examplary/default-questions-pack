@@ -146,10 +146,40 @@ const readPreviewSample = (dir, lang) => {
   return { question: sample?.question ?? {}, answer: sample?.answer ?? {} };
 };
 
+// The preview UI's stub `api` only has `uploadFile`, so components that check
+// for `uploadPickedFile` (e.g. voice-recorder) render as "upload unavailable".
+// Patch a fake one into the bundle next to the `uploadFile` stub.
+const UPLOAD_STUB = "uploadFile:async";
+const UPLOAD_PICKED_FILE_STUB =
+  "uploadPickedFile:async f=>({url:URL.createObjectURL(f),name:f.name}),";
+let warnedAboutUploadStub = false;
+
+const fakeUploadPickedFile = async (page) => {
+  await page.setRequestInterception(true);
+  page.on("request", async (request) => {
+    if (!/\/assets\/index-[^/]+\.js$/.test(new URL(request.url()).pathname)) {
+      return request.continue();
+    }
+    const res = await fetch(request.url());
+    let body = await res.text();
+    // Leave the bundle alone once the CLI provides its own stub
+    if (!body.includes("uploadPickedFile:")) {
+      if (body.includes(UPLOAD_STUB)) {
+        body = body.replace(UPLOAD_STUB, UPLOAD_PICKED_FILE_STUB + UPLOAD_STUB);
+      } else if (!warnedAboutUploadStub) {
+        console.warn("⚠️ Could not fake uploadPickedFile in the preview UI");
+        warnedAboutUploadStub = true;
+      }
+    }
+    request.respond({ status: res.status, contentType: "text/javascript", body });
+  });
+};
+
 const capture = async (browser, typeDir, meta, sample, lang) => {
   const page = await browser.newPage();
   try {
     await page.setViewport({ width: 1400, height: 1000, deviceScaleFactor: 2 });
+    await fakeUploadPickedFile(page);
 
     // Seed the preview UI's localStorage (use-local-storage stores JSON).
     const componentName = meta.components.includes("assessment")
