@@ -8,7 +8,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 
-const BLANK = "___";
+export const BLANK = "___";
 
 export const countBlanks = (text: string) => text.split(BLANK).length - 1;
 

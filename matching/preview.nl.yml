@@ -1,0 +1,19 @@
+question:
+  title: Koppel het fruit aan de kleur
+  description: Verbind elke fruitsoort links met de bijbehorende kleur rechts.
+  settings:
+    left:
+      - Appel
+      - Banaan
+      - Druiven
+    right:
+      - Geel
+      - Paars
+      - Rood
+    correctAnswer:
+      - Appel = Rood
+      - Banaan = Geel
+      - Druiven = Paars
+answer:
+  value:
+    - Appel = Rood

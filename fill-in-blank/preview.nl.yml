@@ -1,0 +1,11 @@
+question:
+  title: Europese hoofdsteden
+  description: Vul de ontbrekende hoofdsteden in.
+  settings:
+    text: De hoofdstad van Frankrijk is ___ en de hoofdstad van Spanje is ___.
+    correctAnswer:
+      - Parijs
+      - Madrid
+answer:
+  value:
+    - Parijs

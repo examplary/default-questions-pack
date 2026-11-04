@@ -1,0 +1,10 @@
+question:
+  title: Edelgassen
+  description: Welke van de volgende elementen zijn edelgassen? Selecteer alle
+    juiste antwoorden.
+  settings:
+    options:
+      - Helium
+      - Zuurstof
+      - Neon
+      - Stikstof

@@ -12,14 +12,14 @@ The passage is displayed with an input field at every blank. Students type a sho
 
 ## Grading
 
-Scored automatically: each blank is compared against the corresponding entry in the configured correct answers. Because the question is either right or wrong per blank, it works best with a small point value (typically 1 point).
+Scored automatically: each blank is compared against the correct answer configured for it, and any alternative answers. Because the question is either right or wrong per blank, it works best with a small point value (typically 1 point).
 
 ## Settings
 
 | Setting | Description |
 | --- | --- |
 | Text | The passage containing one or more blanks, written as `___` (three underscores). |
-| Correct answers | One correct answer per blank, in the same order as the blanks appear in the text. |
-| Dropdown options | Optional, per blank: options separated by `;`. A blank with options becomes a dropdown (QTI inline choice or gap match). |
+| Correct answers | One correct answer per blank, in the same order as the blanks appear in the text. A blank can also accept alternative answers. |
+| Dropdown options | Optional, per blank. A blank with options becomes a dropdown (QTI inline choice or gap match). |
 | Ignore spaces and capitals | Leading and trailing whitespace is always ignored; enable this to ignore letter casing too. |
 | Exact order | On by default: every blank has to match the correct answer configured for it. Turn it off to accept any of the correct answers in any blank, as long as each one is used exactly once. |
