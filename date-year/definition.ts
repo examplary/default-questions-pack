@@ -1,6 +1,6 @@
-import { defineQuestionType } from "@examplary/apps";
+import { QuestionType } from "@examplary/apps";
 
-export default defineQuestionType({
+export default new QuestionType({
   id: "examplary.default.date-year",
   name: {
     en: "Date or year",

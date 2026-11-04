@@ -1,8 +1,8 @@
-import { defineQuestionType } from "@examplary/apps";
+import { QuestionType } from "@examplary/apps";
 
 import validateQuestion from "./functions/validate-question";
 
-const fillInBlank = defineQuestionType({
+const fillInBlank = new QuestionType({
   id: "examplary.expansion.fill-in-blank",
   name: {
     en: "Fill in the blanks",
