@@ -27,7 +27,11 @@ const EssayQuestionComponent: FrontendAssessmentComponent = ({
       <RichTextField
         value={(answer?.value as string) || ""}
         onChange={(value) => {
-          const valid = wordCount >= min && (max === 0 || wordCount <= max);
+          const nextWordCount = count(stripTags(value as string));
+          const valid =
+            nextWordCount > 0 &&
+            nextWordCount >= min &&
+            (max === 0 || nextWordCount <= max);
           saveAnswer({
             value,
             completed: valid,
