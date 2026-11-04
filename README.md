@@ -9,3 +9,7 @@ for your own.
 answer data per language, for rendering previews.
 
 Read more in the [📘 Developer Documentation](https://examplary.ai/developers/apps).
+
+This folder is published as the read-only repository
+[examplary/default-questions-pack](https://github.com/examplary/default-questions-pack), so pull
+requests there can't be merged.
