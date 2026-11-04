@@ -12,6 +12,7 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@examplary/apps": "workspace:^",
+    "lucide-react": "^1.39.0",
     "mathlive": "^0.110.0",
     "striptags": "^3.2.0",
     "word-count": "^0.3.1"
