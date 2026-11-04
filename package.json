@@ -1,5 +1,5 @@
 {
-  "name": "@examplary-default-apps/question-types",
+  "name": "@examplary-default-apps/default-question-types",
   "description": "The default question types of Examplary, as a preinstalled app",
   "type": "module",
   "packageManager": "yarn@4.18.1",

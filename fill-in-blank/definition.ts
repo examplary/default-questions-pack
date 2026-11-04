@@ -1,6 +1,8 @@
 import { defineQuestionType } from "@examplary/apps";
 
-export default defineQuestionType({
+import validateQuestion from "./functions/validate-question";
+
+const fillInBlank = defineQuestionType({
   id: "examplary.expansion.fill-in-blank",
   name: {
     en: "Fill in the blanks",
@@ -16,9 +18,6 @@ export default defineQuestionType({
     print: "./fill-in-blank/component-print.tsx",
     results: "./fill-in-blank/component-results.tsx",
     "settings-area": "./fill-in-blank/component-settings-area.tsx",
-  },
-  functions: {
-    "validate-question": "./fill-in-blank/functions/validate-question.ts",
   },
   generation: {
     enabled: true,
@@ -552,3 +551,7 @@ written "The capital of France is Paris and the capital of Spain is Madrid", the
     nl: "./fill-in-blank/preview.nl.png",
   },
 });
+
+fillInBlank.addValidator(validateQuestion);
+
+export default fillInBlank;
