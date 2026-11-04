@@ -1,0 +1,554 @@
+import { defineQuestionType } from "@examplary/apps";
+
+export default defineQuestionType({
+  id: "examplary.expansion.fill-in-blank",
+  name: {
+    en: "Fill in the blanks",
+    nl: "Aanvullen",
+  },
+  description: {
+    en: "Requires student to fill in one or more blanks with a short text answer. Also known as 'cloze' questions.",
+    nl: "Vraagt de student om een of meer lege plekken in te vullen met een kort tekstantwoord. Ook wel 'cloze' vragen genoemd.",
+  },
+  icon: "./fill-in-blank/icon.svg",
+  components: {
+    assessment: "./fill-in-blank/component-assessment.tsx",
+    print: "./fill-in-blank/component-print.tsx",
+    results: "./fill-in-blank/component-results.tsx",
+    "settings-area": "./fill-in-blank/component-settings-area.tsx",
+  },
+  functions: {
+    "validate-question": "./fill-in-blank/functions/validate-question.ts",
+  },
+  generation: {
+    enabled: true,
+    instructions: `Generate settings that look like this: {"text": "The capital of France is ___ and the capital of Spain is ___", "correctAnswer": ["Paris", "Madrid"]}
+There needs to be at least one blank (___) in the text, and the correctAnswer array needs to have the same number of entries as there are blanks in the text. 
+Only include the text with blanks in the \`text\` field in the settings. Do not add it to the description, and do not give away the correct answers other than 
+in the \`correctAnswer\` field in the settings. Do not include underscores within <inline-math> expressions.
+Since this question type is either always good or wrong, by default make sure this question has a 1 point value, unless otherwise specified.
+Make sure the words to fill in are not used in the title or description of the question.
+`,
+  },
+  scanning: {
+    instructions: `The answer should be an array of strings, with one entry for each blank in the text. 
+For example, if the text has two blanks, the answer should look like ["Paris", "Madrid"]. 
+Make sure to return only the array of strings as the answer, without any additional text or formatting.
+Each entry is compared to the correct answer for its blank, so it should contain only what the student wrote in that blank, in the order of the blanks.
+
+Example: If the \`text\` setting is "The capital of France is ___ and the capital of Spain is ___", and the student has 
+written "The capital of France is Paris and the capital of Spain is Madrid", then the answer value should be ["Paris", "Madrid"].
+`,
+  },
+  timeEstimateMinutes: 2,
+  hasSimpleScoring: true,
+  settings: [
+    {
+      id: "text",
+      type: "string",
+      name: "The question text with blanks",
+      description:
+        "The text of the question (string), with blanks represented by ___",
+      hidden: true,
+      required: true,
+    },
+    {
+      id: "correctAnswer",
+      type: "string-array",
+      name: "Correct answer",
+      description:
+        "The correct answer(s) to the question, that represent the blanks. There needs to be the same number of entries as there are blanks in the text.",
+      hidden: true,
+      required: true,
+    },
+    {
+      id: "alternativeAnswers",
+      type: "custom",
+      name: "Alternative answers per blank",
+      description:
+        'Optional. For each blank, other answers that are accepted besides its entry in `correctAnswer`, e.g. `[["Parijs"], []]`. An empty list (or no entry) accepts only the correct answer.',
+      hidden: true,
+      schema: {
+        type: "array",
+        items: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+        },
+      },
+    },
+    {
+      id: "choices",
+      type: "custom",
+      name: "Choices per blank",
+      description:
+        'Optional. For each blank, the options the student picks from in a dropdown, e.g. `[["is", "are"], []]`. An empty list (or no entry) makes the blank a free text input. The correct answer for a dropdown blank must be one of its options.',
+      hidden: true,
+      schema: {
+        type: "array",
+        items: {
+          type: "array",
+          items: {
+            type: "string",
+          },
+        },
+      },
+    },
+    {
+      id: "exactValuesCaseInsensitive",
+      type: "boolean",
+      name: {
+        en: "Ignore spaces/capitals",
+        nl: "Negeer spaties/hoofdletters",
+      },
+      description:
+        "Leading/trailing whitespace is always ignored when comparing the student's answer to the correct answer. When this is enabled, letter casing is ignored too.",
+      default: true,
+    },
+    {
+      id: "exactOrder",
+      type: "boolean",
+      name: {
+        en: "Exact order",
+        nl: "Exacte volgorde",
+      },
+      description:
+        "When enabled, every blank has to be filled in with the correct answer configured for that blank. When disabled, any of the correct answers is accepted in any blank, as long as each correct answer is used exactly once.",
+      default: true,
+    },
+  ],
+  responseProcessing: {
+    condition: `=(
+  $caseInsensitive := $.question.settings.exactValuesCaseInsensitive = true;
+  /* An empty blank may have been saved as null, and generated answers may be numbers */
+  $normalise := function($v) {(
+    $text := $type($v) = "null" ? "" : $type($v) = "number" ? $string($v) : $v;
+    $caseInsensitive ? $trim($lowercase($text)) : $trim($text)
+  )};
+  $correctAnswer := $.question.settings.correctAnswer;
+  $alternatives := $.question.settings.alternativeAnswers;
+  $type($alternatives) != "array" or $count($reduce($alternatives, $append, [])) = 0
+    ? (
+      /* As before alternative answers were added, so that existing questions are graded exactly as they were */
+      $given := $map($.answer.value, $normalise);
+      $expected := $map($correctAnswer, $normalise);
+      $.question.settings.exactOrder = false
+        ? $join($sort($given), '|') = $join($sort($expected), '|')
+        : $join($given, '|') = $join($expected, '|')
+    )
+    : (
+      /* Normalised up front, as looking up a null by its index gives nothing */
+      $given := $map($.answer.value, $normalise);
+      $expected := $map($correctAnswer, $normalise);
+      $blanks := $count($correctAnswer);
+      $isAccepted := function($value, $blank) {
+        $value in $append($expected[$blank], $map($alternatives[$blank], $normalise))
+      };
+      /* Without exact order, every answer needs its own blank that accepts it */
+      $assign := function($i, $used) {
+        $i = $blanks or $count($filter([0..$blanks - 1], function($blank) {
+          $not($blank in $used) and $isAccepted($given[$i], $blank) and $assign($i + 1, $append($used, $blank))
+        })) > 0
+      };
+      $blanks > 0 and $count($given) = $blanks and (
+        $.question.settings.exactOrder = false
+          ? $assign(0, [])
+          : $count($filter([0..$blanks - 1], function($blank) { $not($isAccepted($given[$blank], $blank)) })) = 0
+      )
+    )
+)
+`,
+    testCases: [
+      {
+        question: {
+          settings: {
+            text: "Capital of France is ___ and Spain is ___",
+            correctAnswer: ["Paris", "Madrid"],
+          },
+        },
+        answer: {
+          value: ["Paris", "Madrid"],
+        },
+        expectedOutcome: true,
+      },
+      {
+        question: {
+          settings: {
+            text: "Capital of France is ___ and Spain is ___",
+            correctAnswer: ["Paris", "Madrid"],
+          },
+        },
+        answer: {
+          value: ["Madrid", "Paris"],
+        },
+        expectedOutcome: false,
+      },
+      {
+        question: {
+          settings: {
+            text: "Capital of France is ___",
+            correctAnswer: ["Paris"],
+          },
+        },
+        answer: {
+          value: ["paris"],
+        },
+        expectedOutcome: false,
+      },
+      {
+        question: {
+          settings: {
+            text: "Capital of France is ___",
+            correctAnswer: ["Paris"],
+          },
+        },
+        answer: {
+          value: ["  Paris "],
+        },
+        expectedOutcome: true,
+      },
+      {
+        question: {
+          settings: {
+            text: "Capital of France is ___",
+            correctAnswer: ["Paris"],
+            exactValuesCaseInsensitive: true,
+          },
+        },
+        answer: {
+          value: ["  paris "],
+        },
+        expectedOutcome: true,
+      },
+      {
+        question: {
+          settings: {
+            text: "Capital of France is ___ and Spain is ___",
+            correctAnswer: ["Paris", "Madrid"],
+            exactOrder: true,
+          },
+        },
+        answer: {
+          value: ["Madrid", "Paris"],
+        },
+        expectedOutcome: false,
+      },
+      {
+        question: {
+          settings: {
+            text: "Capital of France is ___ and Spain is ___",
+            correctAnswer: ["Paris", "Madrid"],
+            exactOrder: false,
+          },
+        },
+        answer: {
+          value: ["Madrid", "Paris"],
+        },
+        expectedOutcome: true,
+      },
+      {
+        question: {
+          settings: {
+            text: "Capital of France is ___ and Spain is ___",
+            correctAnswer: ["Paris", "Madrid"],
+            exactOrder: false,
+          },
+        },
+        answer: {
+          value: ["Paris", "Paris"],
+        },
+        expectedOutcome: false,
+      },
+      {
+        question: {
+          settings: {
+            text: "Capital of France is ___ and Spain is ___",
+            correctAnswer: ["Paris", "Madrid"],
+            exactOrder: false,
+          },
+        },
+        answer: {
+          value: ["Paris"],
+        },
+        expectedOutcome: false,
+      },
+      {
+        question: {
+          settings: {
+            text: "Capital of France is ___ and Spain is ___",
+            correctAnswer: ["Paris", "Madrid"],
+            exactOrder: false,
+            exactValuesCaseInsensitive: true,
+          },
+        },
+        answer: {
+          value: [" madrid", "paris "],
+        },
+        expectedOutcome: true,
+      },
+      {
+        question: {
+          settings: {
+            text: "Capital of France is ___ and Spain is ___",
+            correctAnswer: ["Paris", "Madrid"],
+            alternativeAnswers: [[], []],
+            exactOrder: false,
+          },
+        },
+        answer: {
+          value: ["Madrid", "Paris"],
+        },
+        expectedOutcome: true,
+      },
+      {
+        question: {
+          settings: {
+            text: "Capital of France is ___ and Spain is ___",
+            correctAnswer: ["Paris", "Madrid"],
+          },
+        },
+        answer: {
+          value: ["Paris", null],
+        },
+        expectedOutcome: false,
+      },
+      {
+        question: {
+          settings: {
+            text: "Fill in ___ and ___",
+            correctAnswer: ["Paris", null],
+          },
+        },
+        answer: {
+          value: ["Paris", ""],
+        },
+        expectedOutcome: true,
+      },
+      {
+        question: {
+          settings: {
+            text: "It ended in ___",
+            correctAnswer: [1945],
+          },
+        },
+        answer: {
+          value: [" 1945 "],
+        },
+        expectedOutcome: true,
+      },
+      {
+        question: {
+          settings: {
+            text: "No blanks",
+            correctAnswer: [],
+          },
+        },
+        answer: {
+          value: [],
+        },
+        expectedOutcome: false,
+      },
+      {
+        question: {
+          settings: {
+            text: "Capital of France is ___",
+            correctAnswer: ["Paris"],
+            alternativeAnswers: [["Parijs", "Paname"]],
+          },
+        },
+        answer: {
+          value: ["Paname"],
+        },
+        expectedOutcome: true,
+      },
+      {
+        question: {
+          settings: {
+            text: "Capital of France is ___",
+            correctAnswer: ["Paris"],
+            alternativeAnswers: [["Parijs"]],
+            exactValuesCaseInsensitive: true,
+          },
+        },
+        answer: {
+          value: [" PARIJS "],
+        },
+        expectedOutcome: true,
+      },
+      {
+        question: {
+          settings: {
+            text: "Capital of France is ___ and Spain is ___",
+            correctAnswer: ["Paris", "Madrid"],
+            alternativeAnswers: [["Parijs"], []],
+          },
+        },
+        answer: {
+          value: ["Madrid", "Parijs"],
+        },
+        expectedOutcome: false,
+      },
+      {
+        question: {
+          settings: {
+            text: "Capital of France is ___ and Spain is ___",
+            correctAnswer: ["Paris", "Madrid"],
+            alternativeAnswers: [["Parijs"], []],
+            exactOrder: false,
+          },
+        },
+        answer: {
+          value: ["Madrid", "Parijs"],
+        },
+        expectedOutcome: true,
+      },
+      {
+        question: {
+          settings: {
+            text: "___, ___ and ___",
+            correctAnswer: ["a", "b", "c"],
+            alternativeAnswers: [["x"], [], []],
+            exactOrder: false,
+          },
+        },
+        answer: {
+          value: ["c", "x", "x"],
+        },
+        expectedOutcome: false,
+      },
+      {
+        question: {
+          settings: {
+            text: "Capital of France is ___ and Spain is ___",
+            correctAnswer: ["Paris", "Madrid"],
+            alternativeAnswers: [["Parijs"], []],
+          },
+        },
+        answer: {
+          value: ["Parijs", null],
+        },
+        expectedOutcome: false,
+      },
+    ],
+  },
+  export: {
+    qti3: {
+      gaps: {
+        text: "=$.question.settings.text",
+        answers: "=$.question.settings.correctAnswer",
+        caseInsensitive: "=$.question.settings.exactValuesCaseInsensitive",
+        anyOrder: "=$.question.settings.exactOrder = false",
+      },
+    },
+  },
+  import: {
+    qti3: {
+      gaps: true,
+      settings: {
+        text: "=$.text",
+        correctAnswer: "=$.answers",
+        choices: "=$.choices",
+        exactValuesCaseInsensitive: "=$.caseInsensitive",
+        exactOrder: "=$not($.anyOrder)",
+      },
+    },
+  },
+  translations: {
+    text: {
+      en: "Text to complete",
+      nl: "Tekst om in te vullen",
+    },
+    placeholder: {
+      en: "The capital of France is ___",
+      nl: "De hoofdstad van Frankrijk is ___",
+    },
+    help: {
+      en: "Use three underscores (___) to indicate a blank.",
+      nl: "Gebruik drie onderstrepingstekens (___) om een lege plek aan te geven.",
+    },
+    "help-chips": {
+      en: "Type three underscores (___) to add a blank, then click it to set the answer.",
+      nl: "Typ drie onderstrepingstekens (___) om een lege plek toe te voegen en klik erop om het antwoord in te stellen.",
+    },
+    "insert-blank": {
+      en: "Insert blank",
+      nl: "Lege plek invoegen",
+    },
+    "correct-answer": {
+      en: "Correct answer",
+      nl: "Correct antwoord",
+    },
+    "correct-answers": {
+      en: "Correct answers",
+      nl: "Correct antwoorden",
+    },
+    "add-answer": {
+      en: "Add answer",
+      nl: "Antwoord toevoegen",
+    },
+    "add-option": {
+      en: "Add option",
+      nl: "Optie toevoegen",
+    },
+    remove: {
+      en: "Remove",
+      nl: "Verwijderen",
+    },
+    "show-as-dropdown": {
+      en: "Show as dropdown",
+      nl: "Toon als keuzemenu",
+    },
+    choices: {
+      en: "Dropdown options (optional)",
+      nl: "Keuzemenu-opties (optioneel)",
+    },
+    "choices-placeholder": {
+      en: "is; are",
+      nl: "is; zijn",
+    },
+    "answer-not-in-choices": {
+      en: "The correct answer must be one of the dropdown options.",
+      nl: "Het correcte antwoord moet een van de keuzemenu-opties zijn.",
+    },
+    choose: {
+      en: "Choose...",
+      nl: "Kies...",
+    },
+  },
+  // Example question and answer per language, the Dutch merged over the English
+  metadata: {
+    preview: {
+      en: {
+        question: {
+          title: "European capitals",
+          description: "Fill in the missing capitals.",
+          settings: {
+            text: "The capital of France is ___ and the capital of Spain is ___.",
+            correctAnswer: ["Paris", "Madrid"],
+          },
+        },
+        answer: { value: ["Paris"] },
+      },
+      nl: {
+        question: {
+          title: "Europese hoofdsteden",
+          description: "Vul de ontbrekende hoofdsteden in.",
+          settings: {
+            text: "De hoofdstad van Frankrijk is ___ en de hoofdstad van Spanje is ___.",
+            correctAnswer: ["Parijs", "Madrid"],
+          },
+        },
+        answer: { value: ["Parijs"] },
+      },
+    },
+  },
+  readme: {
+    en: "./fill-in-blank/README.md",
+    nl: "./fill-in-blank/README.nl.md",
+  },
+  previewImage: {
+    en: "./fill-in-blank/preview.png",
+    nl: "./fill-in-blank/preview.nl.png",
+  },
+});

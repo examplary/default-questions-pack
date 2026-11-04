@@ -1,0 +1,33 @@
+{
+  "name": "@examplary-default-apps/question-types",
+  "description": "The default question types of Examplary, as a preinstalled app",
+  "type": "module",
+  "packageManager": "yarn@4.18.1",
+  "scripts": {
+    "deploy": "bash ../deploy.sh",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@examplary/apps": "workspace:^",
+    "mathlive": "^0.110.0",
+    "striptags": "^3.2.0",
+    "word-count": "^0.3.1"
+  },
+  "devDependencies": {
+    "@examplary/cli": "workspace:^",
+    "@examplary/schemas": "workspace:^",
+    "@examplary/ui": "workspace:^",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/react": "^16.3.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.0.4",
+    "jsdom": "^28.1.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-image-crop": "^11.0.10",
+    "vitest": "^5.0.3"
+  }
+}

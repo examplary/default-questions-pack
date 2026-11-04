@@ -1,0 +1,25 @@
+The fill-in-the-blank question type (also known as a _cloze_ question) shows the student a sentence or short passage with one or more gaps to complete. It tests precise recall in context: the surrounding text gives the frame, and the student supplies the missing terms.
+
+## When to use it
+
+- Vocabulary and terminology: "The powerhouse of the cell is the ___."
+- Facts embedded in context: names, places, dates, formula components.
+- Language learning: verb conjugations, prepositions, spelling.
+
+## How it works for students
+
+The passage is displayed with an input field at every blank. Students type a short answer into each gap, or pick one from a dropdown for blanks that have options. A typical fill-in-the-blank question takes about 2 minutes.
+
+## Grading
+
+Scored automatically: each blank is compared against the correct answer configured for it, and any alternative answers. Because the question is either right or wrong per blank, it works best with a small point value (typically 1 point).
+
+## Settings
+
+| Setting                    | Description                                                                                                                                                                            |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Text                       | The passage containing one or more blanks, written as `___` (three underscores).                                                                                                       |
+| Correct answers            | One correct answer per blank, in the same order as the blanks appear in the text. A blank can also accept alternative answers.                                                         |
+| Dropdown options           | Optional, per blank. A blank with options becomes a dropdown (QTI inline choice or gap match).                                                                                         |
+| Ignore spaces and capitals | Leading and trailing whitespace is always ignored; enable this to ignore letter casing too.                                                                                            |
+| Exact order                | On by default: every blank has to match the correct answer configured for it. Turn it off to accept any of the correct answers in any blank, as long as each one is used exactly once. |
