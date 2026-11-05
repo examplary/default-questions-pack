@@ -7,7 +7,6 @@ import "mathlive";
 const AssessmentComponent: FrontendAssessmentComponent = ({
   answer,
   saveAnswer,
-  t,
 }) => {
   const ref = useRef<MathfieldElement>(null);
   const saveAnswerRef = useRef(saveAnswer);

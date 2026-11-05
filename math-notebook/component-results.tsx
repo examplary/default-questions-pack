@@ -1,11 +1,7 @@
 import { FrontendResultsComponent } from "@examplary/ui";
 import "mathlive";
 
-const ResultsComponent: FrontendResultsComponent = ({
-  question,
-  answer,
-  t,
-}) => {
+const ResultsComponent: FrontendResultsComponent = ({ answer }) => {
   if (!answer.value) return null;
 
   const values: string[] = Array.isArray(answer.value) ? answer.value : [];
@@ -20,8 +16,8 @@ const ResultsComponent: FrontendResultsComponent = ({
       {workLines.length > 0 && (
         <div className="space-y-0.5 text-muted-foreground text-sm">
           {workLines.map((line, i) => (
-            // @ts-expect-error math-span
             <div key={i}>
+              {/* @ts-expect-error math-span */}
               <math-span>{line}</math-span>
             </div>
           ))}

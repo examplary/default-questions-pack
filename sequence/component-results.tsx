@@ -1,6 +1,6 @@
 import { FrontendResultsComponent, RichTextDisplay } from "@examplary/ui";
 
-const ResultsComponent: FrontendResultsComponent = ({ question, answer }) => {
+const ResultsComponent: FrontendResultsComponent = ({ answer }) => {
   if (!answer.value) return null;
 
   return (

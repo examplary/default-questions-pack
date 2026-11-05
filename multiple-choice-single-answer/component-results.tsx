@@ -1,10 +1,6 @@
 import { FrontendResultsComponent, RichTextDisplay } from "@examplary/ui";
 
-const ResultsComponent: FrontendResultsComponent = ({
-  question,
-  answer,
-  t,
-}) => {
+const ResultsComponent: FrontendResultsComponent = ({ question, answer }) => {
   if (!answer.value) return null;
 
   let value = answer.value as string;

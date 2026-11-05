@@ -1,10 +1,6 @@
 import { useMemo } from "react";
 
-import {
-  AnswerBox,
-  FrontendPrintComponent,
-  RichTextDisplay,
-} from "@examplary/ui";
+import { FrontendPrintComponent, RichTextDisplay } from "@examplary/ui";
 
 const PrintComponent: FrontendPrintComponent = ({ answerBoxes, question }) => {
   const shuffledOptions = useMemo(

@@ -3,7 +3,6 @@ import {
   FrontendAssessmentComponent,
   RadioGroup,
   RadioGroupItem,
-  RichTextDisplay,
 } from "@examplary/ui";
 
 const AssessmentComponent: FrontendAssessmentComponent = ({

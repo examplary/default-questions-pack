@@ -66,7 +66,7 @@ const SettingsAreaComponent: FrontendQuestionSettingsAreaComponent = ({
   const handleImageUpload = async (index: number) => {
     try {
       setUploading(index.toString());
-      const { url, name } = await api.uploadFile("image/*");
+      const { url } = await api.uploadFile("image/*");
 
       const newOptions = [...options];
       if (index === options.length) {
