@@ -40,6 +40,7 @@ export default new QuestionType({
   ],
   shortcut: "1",
   index: 100,
+  defaultPinned: true,
   export: {
     qti3: {
       interaction: {

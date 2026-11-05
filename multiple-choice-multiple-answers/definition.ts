@@ -41,6 +41,7 @@ The student might instead use letters to specify their answer, eg. 'A' for the f
   hasSimpleScoring: true,
   timeEstimateMinutes: 1,
   index: 201,
+  defaultPinned: true,
   settings: [
     {
       id: "options",

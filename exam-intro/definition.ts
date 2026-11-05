@@ -18,6 +18,7 @@ export default new QuestionType({
   },
   hideSettings: true,
   index: -3000,
+  defaultPinned: true,
   enforcePosition: "start",
   enforceTitle: {
     en: "Introduction",

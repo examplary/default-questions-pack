@@ -41,6 +41,7 @@ The student might instead use letters to specify their answer, eg. 'A' for the f
   timeEstimateMinutes: 1,
   shortcut: "3",
   index: 200,
+  defaultPinned: true,
   settings: [
     {
       id: "options",

@@ -60,6 +60,7 @@ penalise the student for criteria the conversation never got to.
   isPreviewRefreshable: true,
   timeEstimateMinutes: 10,
   index: 1,
+  defaultPinned: true,
   settings: [
     {
       id: "persona",

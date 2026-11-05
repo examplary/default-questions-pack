@@ -42,6 +42,7 @@ written "The capital of France is Paris and the capital of Spain is Madrid", the
   },
   timeEstimateMinutes: 2,
   hasSimpleScoring: true,
+  defaultPinned: true,
   settings: [
     {
       id: "text",

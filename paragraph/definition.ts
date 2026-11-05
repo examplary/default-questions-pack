@@ -19,6 +19,7 @@ export default new QuestionType({
   },
   hideSettings: true,
   index: -2000,
+  defaultPinned: true,
   settings: [],
   export: {
     qti3: {

@@ -28,6 +28,7 @@ If the student specifies just the letter 'A', that means true, or 'B' for false.
   },
   timeEstimateMinutes: 1,
   index: 400,
+  defaultPinned: true,
   settings: [
     {
       id: "correctAnswer",

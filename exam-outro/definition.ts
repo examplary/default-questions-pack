@@ -18,6 +18,7 @@ export default new QuestionType({
   },
   hideSettings: true,
   index: -1000,
+  defaultPinned: true,
   enforcePosition: "end",
   enforceTitle: {
     en: "Outro",

@@ -25,6 +25,7 @@ export default new QuestionType({
   },
   timeEstimateMinutes: 15,
   index: 500,
+  defaultPinned: true,
   settings: [
     {
       id: "minWords",

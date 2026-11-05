@@ -42,6 +42,7 @@ export default new QuestionType({
   timeEstimateMinutes: 5,
   shortcut: "2",
   index: 101,
+  defaultPinned: true,
   // Example question and answer per language, the Dutch merged over the English
   metadata: {
     preview: {
