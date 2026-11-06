@@ -34,11 +34,10 @@ const ResultsComponent: FrontendResultsComponent = ({ answer, question }) => {
               <RichTextDisplay>{findLabel(left, pair.left)}</RichTextDisplay>
             </div>
             <div
-              className={
-                horizontal
-                  ? "h-5 w-0 border-l border-border print:border-black"
-                  : "h-0 w-5 border-t border-border print:border-black"
-              }
+              className={cn(
+                "h-0 w-5 border-t border-border print:border-black",
+                horizontal && "md:h-5 md:w-0 md:border-t-0 md:border-l",
+              )}
             />
             <div
               className={cn(
