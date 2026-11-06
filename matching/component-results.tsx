@@ -11,20 +11,35 @@ const ResultsComponent: FrontendResultsComponent = ({ answer, question }) => {
 
   const { left, right, correctAnswer } = getMatchingData(question.settings);
   const leftValues = left.map((option) => option.value);
+  const horizontal =
+    question.settings.layout === "horizontal" && left.length <= 4;
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className={cn("flex flex-col gap-2", horizontal && "md:flex-row!")}>
       {answer.value?.map?.((option: string, index: number) => {
         const pair = splitPair(option, leftValues);
         const incorrect =
           correctAnswer.length > 0 && !correctAnswer.includes(option);
 
         return (
-          <div className="flex items-center" key={index}>
+          <div
+            className={cn(
+              "flex items-center",
+              horizontal && "flex-1 md:flex-col",
+            )}
+            data-type="matching-option"
+            key={index}
+          >
             <div className="flex-1 w-full border border-border print:border-black rounded-xl p-1.5 px-3 overflow-hidden">
               <RichTextDisplay>{findLabel(left, pair.left)}</RichTextDisplay>
             </div>
-            <div className="h-0 w-5 border-t border-border print:border-black" />
+            <div
+              className={
+                horizontal
+                  ? "h-5 w-0 border-l border-border print:border-black"
+                  : "h-0 w-5 border-t border-border print:border-black"
+              }
+            />
             <div
               className={cn(
                 "flex-1 w-full border border-border print:border-black rounded-xl p-1.5 px-3 overflow-hidden",
