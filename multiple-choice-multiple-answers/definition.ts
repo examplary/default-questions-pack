@@ -1,6 +1,8 @@
 import { QuestionType } from "@examplary/apps";
 
-export default new QuestionType({
+import validateQuestion from "./functions/validate-question";
+
+const multipleChoiceMultipleAnswers = new QuestionType({
   id: "examplary.default.multiple-choice-multiple-answers",
   name: {
     en: "Checkboxes",
@@ -193,3 +195,7 @@ The student might instead use letters to specify their answer, eg. 'A' for the f
     nl: "./multiple-choice-multiple-answers/preview.nl.png",
   },
 });
+
+multipleChoiceMultipleAnswers.addValidator(validateQuestion);
+
+export default multipleChoiceMultipleAnswers;
