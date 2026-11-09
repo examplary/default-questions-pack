@@ -34,6 +34,9 @@ const EssayQuestionComponent: FrontendAssessmentComponent = ({
             (max === 0 || nextWordCount <= max);
           saveAnswer({
             value,
+            context: {
+              wordCount: nextWordCount,
+            },
             completed: valid,
           });
         }}
