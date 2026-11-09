@@ -15,6 +15,19 @@ const invalid = (error: string): ValidateQuestionResult => ({
   error,
 });
 
+const isImageUrl = (value: string) => {
+  if (/^data:image\/[^,]+,/i.test(value)) {
+    return true;
+  }
+
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+};
+
 export default function validateQuestion(input: {
   question: Question;
 }): ValidateQuestionResult {
@@ -24,7 +37,12 @@ export default function validateQuestion(input: {
   if (!Array.isArray(options) || options.length < 2) {
     return invalid("There need to be at least two options.");
   }
-  if (options.some((option) => typeof option !== "string" || !option.trim())) {
+  if (
+    options.some(
+      (option) =>
+        typeof option !== "string" || !option.trim() || !isImageUrl(option),
+    )
+  ) {
     return invalid("Every option needs to be a non-empty image URL.");
   }
   if (new Set(options).size !== options.length) {

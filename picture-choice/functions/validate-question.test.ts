@@ -16,6 +16,16 @@ describe("validateQuestion", () => {
     ).toEqual({ valid: true });
   });
 
+  it("accepts image data URLs", () => {
+    const dataUrl = "data:image/svg+xml,%3Csvg%3E";
+    expect(
+      validate({
+        options: [dataUrl, ...options.slice(1)],
+        correctAnswer: dataUrl,
+      }),
+    ).toEqual({ valid: true });
+  });
+
   it("needs settings", () => {
     expect(validate(undefined)).toEqual({
       valid: false,
@@ -36,6 +46,18 @@ describe("validateQuestion", () => {
         correctAnswer: options[0],
       }),
     ).toEqual({ valid: false, error: "All options need to be unique." });
+  });
+
+  it("rejects options that are not image URLs", () => {
+    expect(
+      validate({
+        options: ["not an image URL", "also not an image URL"],
+        correctAnswer: "not an image URL",
+      }),
+    ).toEqual({
+      valid: false,
+      error: "Every option needs to be a non-empty image URL.",
+    });
   });
 
   it("needs a correct answer", () => {
