@@ -14,6 +14,7 @@ export default new QuestionType({
   components: {
     assessment: "./essay/component-assessment.tsx",
     print: "./essay/component-print.tsx",
+    results: "./essay/component-results.tsx",
   },
   generation: {
     enabled: true,
@@ -63,6 +64,10 @@ export default new QuestionType({
     },
   },
   translations: {
+    "empty-answer": {
+      en: "Empty answer",
+      nl: "Leeg antwoord",
+    },
     "word-count_one": {
       en: "{{count}} word",
       nl: "{{count}} woord",
