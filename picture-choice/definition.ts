@@ -1,6 +1,8 @@
 import { QuestionType } from "@examplary/apps";
 
-export default new QuestionType({
+import validateQuestion from "./functions/validate-question";
+
+const pictureChoice = new QuestionType({
   id: "examplary.default.picture-choice",
   name: {
     en: "Picture choice",
@@ -147,3 +149,7 @@ The printed sheet labels the pictures with letters, so the student will usually 
     nl: "./picture-choice/preview.nl.png",
   },
 });
+
+pictureChoice.addValidator(validateQuestion);
+
+export default pictureChoice;

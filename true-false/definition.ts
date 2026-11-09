@@ -1,6 +1,8 @@
 import { QuestionType } from "@examplary/apps";
 
-export default new QuestionType({
+import validateQuestion from "./functions/validate-question";
+
+const trueFalse = new QuestionType({
   id: "examplary.default.true-false",
   name: {
     en: "True/false",
@@ -166,3 +168,7 @@ If the student specifies just the letter 'A', that means true, or 'B' for false.
     nl: "./true-false/preview.nl.png",
   },
 });
+
+trueFalse.addValidator(validateQuestion);
+
+export default trueFalse;
