@@ -17,11 +17,17 @@ export default new QuestionType({
   },
   generation: {
     enabled: true,
-    instructions: `The answer to this question is a long-form essay. The student may use headings and text formatting to structure their answer. Settings minWords and maxWords are optional. Set them to 0 if you don't want to use them; they must be finite numbers, since the settings are stored as JSON, which has no Infinity.
-`,
+    instructions: `
+      The answer to this question is a long-form essay. The student may use headings and text formatting to structure their answer.
+      Settings minWords and maxWords are optional. Set them to 0 if you don't want to use them; they must be finite numbers, since the settings are stored as JSON, which has no Infinity.
+    `,
   },
   grading: {
     enabled: true,
+    instructions: `
+      Make sure to keep in mind the word count settings when grading the essay, and
+      look at the \`wordCount\` context key when evaluating the essay's length.
+    `,
   },
   timeEstimateMinutes: 15,
   index: 500,
