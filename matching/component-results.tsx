@@ -35,8 +35,8 @@ const ResultsComponent: FrontendResultsComponent = ({ answer, question }) => {
             </div>
             <div
               className={cn(
-                "h-0 w-5 border-t border-border print:border-black",
-                horizontal && "md:h-5 md:w-0 md:border-t-0 md:border-l",
+                "border-border print:border-black",
+                horizontal ? "md:h-5 md:w-0 md:border-l" : "h-0 w-5 border-t",
               )}
             />
             <div
