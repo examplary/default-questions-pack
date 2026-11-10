@@ -6,12 +6,14 @@ import {
   RichTextDisplay,
 } from "@examplary/ui";
 import { RadioGroup, RadioGroupItem } from "@examplary/ui";
+import { MessageSquareTextIcon } from "lucide-react";
 
 const AssessmentComponent: FrontendAssessmentComponent = ({
   question,
   saveAnswer,
   answer,
   reviewMode,
+  feedback,
 }) => {
   const options = useMemo(
     () =>
@@ -30,16 +32,24 @@ const AssessmentComponent: FrontendAssessmentComponent = ({
         {options.map((option: string, index: number) => (
           <label key={index} className="flex gap-2 items-start w-full">
             <RadioGroupItem value={option} />
-            <RichTextDisplay
-              className={cn(
-                "text-sm",
-                reviewMode &&
-                  question.settings.correctAnswer === option &&
-                  "bg-green-50 text-green-800 px-1.5 py-0.5 -mx-1.5 -my-0.5 rounded-xl inline-block",
+            <div>
+              <RichTextDisplay
+                className={cn(
+                  "text-sm",
+                  reviewMode &&
+                    question.settings.correctAnswer === option &&
+                    "bg-green-50 text-green-800 px-1.5 py-0.5 -mx-1.5 -my-0.5 rounded-xl inline-block",
+                )}
+              >
+                {option}
+              </RichTextDisplay>
+              {feedback?.byValue?.[option] && (
+                <div className="mt-1 flex gap-1.5 text-[13px] text-zinc-600">
+                  <MessageSquareTextIcon className="size-3.5 mt-0.5 shrink-0" />
+                  <RichTextDisplay>{feedback.byValue[option]}</RichTextDisplay>
+                </div>
               )}
-            >
-              {option}
-            </RichTextDisplay>
+            </div>
           </label>
         ))}
       </div>

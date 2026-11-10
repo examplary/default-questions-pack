@@ -13,6 +13,7 @@ type Options = {
   isPreview?: boolean;
   /** Stands in for the host API, e.g. `{ ai: { generate } }` for AI question types */
   api?: any;
+  feedback?: { byValue?: Record<string, string> };
 };
 
 // Stands in for the exam host: assessment components are controlled, so a
@@ -25,6 +26,7 @@ const Host = ({
   reviewMode,
   isPreview,
   api,
+  feedback,
 }: any) => {
   const [answer, setAnswer] = useState<Answer | undefined>(initialAnswer);
   return (
@@ -43,6 +45,7 @@ const Host = ({
       t={(key: string | string[]) => (Array.isArray(key) ? key[0] : key)}
       i18n={{ language: "en" }}
       api={api}
+      feedback={feedback}
     />
   );
 };
@@ -62,6 +65,7 @@ export const renderAssessment = (
     reviewMode = false,
     isPreview = false,
     api = {},
+    feedback,
   }: Options = {},
 ): AssessmentHarness => {
   const saved: Answer[] = [];
@@ -78,6 +82,7 @@ export const renderAssessment = (
       reviewMode={reviewMode}
       isPreview={isPreview}
       api={api}
+      feedback={feedback}
     />,
   );
 

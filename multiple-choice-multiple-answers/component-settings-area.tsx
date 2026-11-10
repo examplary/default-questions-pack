@@ -1,17 +1,22 @@
 import {
+  Checkbox,
+  FeedbackByValueButton,
   FrontendQuestionSettingsAreaComponent,
   MinimalRichTextField,
-  Checkbox,
 } from "@examplary/ui";
 import { Trash2Icon } from "lucide-react";
 
 import { CorrectAnswerIndicator } from "./components/correct-answer-indicator";
 
 const OptionsArea: FrontendQuestionSettingsAreaComponent = ({
+  question,
   settings,
   setMultipleSettings,
+  setFeedbackByValue,
   t,
 }) => {
+  const feedbackByValue = question.feedback?.predefined?.byValue ?? {};
+
   const values = {
     options: settings.options || [],
     correctAnswer: settings.correctAnswer || [],
@@ -69,6 +74,12 @@ const OptionsArea: FrontendQuestionSettingsAreaComponent = ({
                 const newOptions = [...options];
                 newOptions[index] = { ...option, value };
                 updateOptions(newOptions);
+                if (feedbackByValue[option.value]) {
+                  setFeedbackByValue({
+                    [option.value]: null,
+                    [value]: feedbackByValue[option.value],
+                  });
+                }
               }}
               placeholder={t("option-placeholder")}
               onKeyUp={(e) => {
@@ -105,9 +116,19 @@ const OptionsArea: FrontendQuestionSettingsAreaComponent = ({
             {option.correct && <CorrectAnswerIndicator t={t} />}
           </div>
 
+          {index !== options.length && (
+            <FeedbackByValueButton
+              feedback={feedbackByValue[option.value]}
+              onChange={(feedback) =>
+                setFeedbackByValue({ [option.value]: feedback })
+              }
+              label={t("option-feedback")}
+              placeholder={t("option-feedback-placeholder")}
+            />
+          )}
           {options.length > 1 && index !== options.length && (
             <button
-              className="ml-auto pl-1 text-gray-500 hover:text-black transition cursor-pointer"
+              className="ml-auto pl-1 text-zinc-400 hover:text-black transition cursor-pointer"
               onClick={() => {
                 const newOptions = [...options];
                 newOptions.splice(index, 1);

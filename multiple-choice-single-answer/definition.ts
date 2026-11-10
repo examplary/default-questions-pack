@@ -140,6 +140,14 @@ The student might instead use letters to specify their answer, eg. 'A' for the f
       en: "Remove option",
       nl: "Optie verwijderen",
     },
+    "option-feedback": {
+      en: "Feedback when chosen",
+      nl: "Feedback bij deze keuze",
+    },
+    "option-feedback-placeholder": {
+      en: "Shown to students who pick this option",
+      nl: "Getoond aan leerlingen die deze optie kiezen",
+    },
     "correct-answer": {
       en: "Correct answer",
       nl: "Correct antwoord",
