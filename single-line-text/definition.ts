@@ -51,6 +51,18 @@ export default new QuestionType({
       },
     },
   },
+  import: {
+    qti3: {
+      interaction: {
+        type: "TextEntryInteraction",
+      },
+      settings: {
+        expectedLength: "=$.interaction.expectedLength ?? 50",
+        placeholder:
+          "=$.interaction.placeholderText ? $.interaction.placeholderText",
+      },
+    },
+  },
   translations: {
     placeholder: {
       en: "Type your answer...",

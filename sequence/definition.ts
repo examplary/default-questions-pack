@@ -104,6 +104,27 @@ The student might instead use letters to specify their answer, eg. 'A' for the f
       // TODO: specify response processing?
     },
   },
+  import: {
+    qti3: {
+      interaction: {
+        type: "OrderInteraction",
+      },
+      settings: {
+        // Options are stored in the correct order, as the response
+        // processing scores against them
+        options: `=(
+  $ids := $.correctResponse;
+  $choices := $.interaction.choices;
+  $ordered := $append(
+    [$ids.($id := $; $choices[identifier = $id][0])],
+    [$choices[$not(identifier in $ids)]]
+  );
+  [$ordered.(content ?? '')]
+)
+`,
+      },
+    },
+  },
   translations: {
     options: {
       en: "Items to arrange",

@@ -143,6 +143,24 @@ The student might instead use letters to specify their answer, eg. 'A' for the f
       },
     },
   },
+  import: {
+    qti3: {
+      interaction: {
+        type: "ChoiceInteraction",
+      },
+      // Not `!= 1`, which is false when the item leaves out max-choices
+      condition: "=$not($.interaction.maxChoices = 1)",
+      settings: {
+        options: "=[$.interaction.choices.(content ?? '')]",
+        correctAnswer: `=(
+  $correct := $.correctResponse;
+  [$.interaction.choices[identifier in $correct].(content ?? '')]
+)
+`,
+        shuffleAnswers: "=$.interaction.shuffle = true",
+      },
+    },
+  },
   translations: {
     "option-placeholder": {
       en: "Add option...",
