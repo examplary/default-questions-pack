@@ -63,6 +63,17 @@ export default new QuestionType({
       },
     },
   },
+  import: {
+    qti3: {
+      interaction: {
+        type: "ExtendedTextInteraction",
+      },
+      settings: {
+        expectedLines: "=$.interaction.expectedLines ?? 5",
+        expectedLength: "=$.interaction.expectedLength ?? 500",
+      },
+    },
+  },
   translations: {
     "empty-answer": {
       en: "Empty answer",
