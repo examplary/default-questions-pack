@@ -6,7 +6,8 @@ import {
   FrontendAssessmentComponent,
   RichTextDisplay,
 } from "@examplary/ui";
-import { MessageSquareTextIcon } from "lucide-react";
+
+import { OptionFeedback } from "./components/option-feedback";
 
 const AssessmentComponent: FrontendAssessmentComponent = ({
   question,
@@ -58,12 +59,7 @@ const AssessmentComponent: FrontendAssessmentComponent = ({
             >
               {option}
             </RichTextDisplay>
-            {feedback?.byValue?.[option] && (
-              <div className="mt-1 flex gap-1.5 text-[13px] text-zinc-600">
-                <MessageSquareTextIcon className="size-3.5 mt-0.5 shrink-0" />
-                <RichTextDisplay>{feedback.byValue[option]}</RichTextDisplay>
-              </div>
-            )}
+            <OptionFeedback feedback={feedback?.byValue?.[option]} />
           </div>
         </label>
       ))}
