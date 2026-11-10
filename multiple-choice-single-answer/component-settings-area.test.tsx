@@ -3,8 +3,10 @@ import { describe, expect, it, vi } from "vitest";
 
 import SettingsAreaComponent from "./component-settings-area";
 
-const renderSettingsArea = (byValue: Record<string, string>) => {
-  const setFeedbackByValue = vi.fn();
+const renderSettingsArea = (
+  byValue: Record<string, string>,
+  setFeedbackByValue: ReturnType<typeof vi.fn> | null = vi.fn(),
+) => {
   const Component = SettingsAreaComponent as any;
   const result = render(
     <Component
@@ -51,5 +53,19 @@ describe("multiple choice (single-answer) option feedback", () => {
     );
 
     expect(setFeedbackByValue).not.toHaveBeenCalled();
+  });
+
+  it("leaves out option feedback on hosts that don't support it yet", () => {
+    const { optionEditor, queryAllByTitle } = renderSettingsArea(
+      { Lyon: "<p>Second city.</p>" },
+      null,
+    );
+
+    expect(queryAllByTitle("option-feedback")).toHaveLength(0);
+    expect(() =>
+      act(() =>
+        optionEditor(1).commands.setContent("Lyons", { emitUpdate: true }),
+      ),
+    ).not.toThrow();
   });
 });

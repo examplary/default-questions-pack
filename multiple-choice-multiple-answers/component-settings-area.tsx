@@ -16,6 +16,10 @@ const OptionsArea: FrontendQuestionSettingsAreaComponent = ({
   t,
 }) => {
   const feedbackByValue = question.feedback?.predefined?.byValue ?? {};
+  // Older hosts don't provide these yet
+  const supportsFeedbackByValue = Boolean(
+    FeedbackByValueButton && setFeedbackByValue,
+  );
 
   const values = {
     options: settings.options || [],
@@ -74,7 +78,7 @@ const OptionsArea: FrontendQuestionSettingsAreaComponent = ({
                 const newOptions = [...options];
                 newOptions[index] = { ...option, value };
                 updateOptions(newOptions);
-                if (feedbackByValue[option.value]) {
+                if (supportsFeedbackByValue && feedbackByValue[option.value]) {
                   setFeedbackByValue({
                     [option.value]: null,
                     [value]: feedbackByValue[option.value],
@@ -116,7 +120,7 @@ const OptionsArea: FrontendQuestionSettingsAreaComponent = ({
             {option.correct && <CorrectAnswerIndicator t={t} />}
           </div>
 
-          {index !== options.length && (
+          {supportsFeedbackByValue && index !== options.length && (
             <FeedbackByValueButton
               feedback={feedbackByValue[option.value]}
               onChange={(feedback) =>
