@@ -59,6 +59,14 @@ export default new QuestionType({
           },
         },
         {
+          value:
+            ".xlsx,.xlsm,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel.sheet.macroEnabled.12",
+          label: {
+            en: "Only Excel spreadsheets",
+            nl: "Alleen Excel-spreadsheets",
+          },
+        },
+        {
           value: "image/*",
           label: {
             en: "Only images",

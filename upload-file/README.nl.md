@@ -14,6 +14,8 @@ De leerling uploadt het bestand via een bestandskiezer of door het erheen te sle
 
 Wordt waar mogelijk door AI nagekeken (het geüploade bestand wordt geopend en beoordeeld op basis van je beoordelingscriteria), en jij controleert het resultaat. Bestandsformaten die de AI niet kan openen, kijk je zoals gewoonlijk zelf na.
 
+Excel-bestanden (.xlsx en .xlsm) worden inclusief formules en celverwijzingen gelezen, niet alleen de uitkomsten. Als het voor je beoordeling uitmaakt hoe leerlingen formules gebruiken, zet dat dan in je beoordelingsmodel. Oudere .xls-bestanden kunnen niet worden gelezen: kies "Alleen Excel-spreadsheets" zodat leerlingen een formaat inleveren dat de AI kan nakijken.
+
 ## Instellingen
 
 | Instelling                  | Beschrijving                                                     |

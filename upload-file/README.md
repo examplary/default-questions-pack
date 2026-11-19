@@ -14,6 +14,8 @@ The student uploads their file through a file picker or drag-and-drop. You can r
 
 Graded by AI where possible — the uploaded file is opened and assessed against your scoring criteria — with your review. For file formats the AI can't inspect, you grade manually as usual.
 
+Excel workbooks (.xlsx and .xlsm) are read with their formulas and cell references, not just the final numbers. If how students use formulas matters for your marking, say so in your rubric. Older .xls files can't be read: choose "Only Excel spreadsheets" to make sure students hand in a format the AI can grade.
+
 ## Settings
 
 | Setting             | Description                                               |
