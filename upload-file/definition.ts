@@ -67,6 +67,14 @@ export default new QuestionType({
           },
         },
         {
+          value:
+            ".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation",
+          label: {
+            en: "Only PowerPoint presentations",
+            nl: "Alleen PowerPoint-presentaties",
+          },
+        },
+        {
           value: "image/*",
           label: {
             en: "Only images",
