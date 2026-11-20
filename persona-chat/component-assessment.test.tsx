@@ -154,3 +154,37 @@ describe("conversation flow", () => {
     );
   });
 });
+
+describe("when the AI fails to reply", () => {
+  it("shows an error and resends the same turn on retry", async () => {
+    const generate = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("The AI took too long to respond."))
+      .mockResolvedValueOnce({
+        content: "<p>Why does a plant need light?</p>",
+        completed: false,
+      });
+    const harness = renderAssessment(AssessmentComponent, {
+      settings,
+      api: { ai: { generate } },
+    });
+    vi.spyOn(console, "error").mockImplementation(() => {});
+
+    say("Because of photosynthesis.");
+
+    await waitFor(() => expect(harness.getByRole("alert")).toBeTruthy());
+    expect(harness.getByText("error-no-reply")).toBeTruthy();
+    expect(harness.saved).toHaveLength(0);
+
+    fireEvent.click(harness.getByText("try-again"));
+
+    await waitFor(() =>
+      expect(harness.lastSaved()?.value).toBe(
+        "<div><b>student:</b> Because of photosynthesis.</div>\n" +
+          "<div><b>assistant:</b> <p>Why does a plant need light?</p></div>",
+      ),
+    );
+    expect(messagesOf(generate, 1)).toEqual(messagesOf(generate, 0));
+    expect(harness.queryByRole("alert")).toBeNull();
+  });
+});

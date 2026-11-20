@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 
-import { ChatInput, type FrontendAssessmentComponent } from "@examplary/ui";
+import {
+  Button,
+  ChatInput,
+  type FrontendAssessmentComponent,
+} from "@examplary/ui";
 
 import { ChatTranscript } from "./lib/chat-transcript";
 import { schema } from "./schema";
@@ -25,6 +29,8 @@ const AssessmentComponent: FrontendAssessmentComponent = ({
   t,
 }) => {
   const [loading, setLoading] = useState(false);
+  // The chat to send again when the AI failed to reply to it
+  const [failedChat, setFailedChat] = useState<Chat | null>(null);
   const started = useRef(false);
 
   const maxTurns = getMaxTurns(question.settings);
@@ -60,8 +66,7 @@ const AssessmentComponent: FrontendAssessmentComponent = ({
     if (loading) return;
 
     setLoading(true);
-
-    // TODO: error handling
+    setFailedChat(null);
 
     const priorAssistantTurns = countAssistantTurns(newChat);
     const messages: Chat = [...newChat];
@@ -86,6 +91,7 @@ const AssessmentComponent: FrontendAssessmentComponent = ({
       response = await (api as any).ai.generate({ messages, schema });
     } catch (error) {
       console.error(error);
+      setFailedChat(newChat);
       return;
     } finally {
       setLoading(false);
@@ -123,6 +129,18 @@ const AssessmentComponent: FrontendAssessmentComponent = ({
   return (
     <div className="w-full">
       <ChatTranscript messages={chat} typing={loading && !complete} t={t} />
+
+      {failedChat && !loading && (
+        <div
+          className="bg-red-50 text-red-900 mt-4 p-4 rounded-lg w-full text-sm flex items-center justify-between gap-4"
+          role="alert"
+        >
+          {t("error-no-reply")}
+          <Button variant="secondary" onClick={() => nextStep(failedChat)}>
+            {t("try-again")}
+          </Button>
+        </div>
+      )}
 
       {complete ? (
         <div

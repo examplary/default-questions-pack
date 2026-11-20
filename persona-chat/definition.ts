@@ -377,6 +377,14 @@ message once this budget is used up.
       en: "The API is not available, so we can't start the question.",
       nl: "De API is niet beschikbaar, dus we kunnen de vraag niet starten.",
     },
+    "error-no-reply": {
+      en: "Something went wrong while waiting for a reply.",
+      nl: "Er ging iets mis bij het wachten op een antwoord.",
+    },
+    "try-again": {
+      en: "Try again",
+      nl: "Opnieuw proberen",
+    },
   },
   // Example question and answer per language, the Dutch merged over the English
   metadata: {
